@@ -1,0 +1,88 @@
+# =========================
+# ARCHIVOS SENSIBLES
+# =========================
+.env
+*.env
+*.key
+*.pem
+*.crt
+*.p12
+*.cert
+
+# =========================
+# DEPENDENCIAS
+# =========================
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# LOGS Y CACHÉ
+# =========================
+logs/
+*.log
+*.tmp
+*.out
+*.pid
+*.seed
+*.pid.lock
+pids/
+
+# Coverage / testing
+coverage/
+.nyc_output/
+.vscode-test/
+
+# =========================
+# COMPILACIÓN Y BUILDS
+# =========================
+dist/
+dist-ssr/
+build/
+tmp/
+.cache/
+
+# =========================
+# SISTEMA / IDE
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej
+*.log
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# =========================
+# FRONTEND (Vite / React)
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.DS_Store
+
+# =========================
+# BACKEND (Express / Node)
+# =========================
+backend/node_modules/
+backend/.env
+backend/.DS_Store
+
+# =========================
+# ARCHIVOS TEMPORALES / LOCALES
+# =========================
+*.local
+*.cache
+*.tmp
