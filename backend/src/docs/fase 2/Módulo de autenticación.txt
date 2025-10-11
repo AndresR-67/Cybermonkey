@@ -1,0 +1,25 @@
+src/controllers/authController.js
+
+Maneja el registro e inicio de sesión de usuarios, así como la emisión de tokens JWT.
+Funciones principales:
+register: crea un nuevo usuario (PostgreSQL) y genera log en MongoDB.
+login: valida credenciales y devuelve token JWT.
+
+
+src/utils/jwt.js
+Encargado de generar y verificar tokens JWT.
+
+src/routes/authRoutes.js
+Define los endpoints /api/auth/register y /api/auth/login.
+
+src/routes/index.js
+Punto central que agrupa todas las rutas de la API.
+
+Conclusiones de la fase
+
+Se estableció la infraestructura base del backend con:
+
+Express + PostgreSQL + MongoDB operando simultáneamente.
+JWT funcional con configuración de entorno segura.
+Rutas organizadas modularmente (routes/index.js).
+Pruebas funcionales mediante curl.

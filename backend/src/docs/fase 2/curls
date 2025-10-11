@@ -1,0 +1,19 @@
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombres": "Anderson",
+    "apellidos": "Gp",
+    "username": "gp23",
+    "correo": "gp23@example.com",
+    "contrasena": "12234",
+    "foto_perfil": "https://i.imgur.com/avatar.png",
+    "id_rol": 1
+  }'
+
+
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "identifier": "giorno@example.com",
+    "contrasena": "goldenwind"
+  }'

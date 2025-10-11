@@ -1,0 +1,19 @@
+backend/
+├── .env
+├── package.json
+├── server.js
+└── src/
+    ├── config/
+    │   ├── db.js           → Conexión PostgreSQL
+    │   └── mongo.js        → Conexión MongoDB (Atlas)
+    ├── controllers/
+    │   └── authController.js  → Manejo de registro e inicio de sesión
+    ├── models/
+    │   └── usuarioModel.js    → Consultas SQL relacionadas con los usuarios
+    ├── routes/
+    │   ├── authRoutes.js      → Endpoints de autenticación
+    │   └── index.js           → Punto central de rutas
+    ├── services/
+    │   └── logService.js      → Registro de acciones en MongoDB
+    └── utils/
+        └── jwt.js             → Generación y verificación de tokens JWT

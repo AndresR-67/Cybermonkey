@@ -1,0 +1,2 @@
+En esta fase se configuró el servidor backend base con soporte para PostgreSQL y MongoDB, junto con un sistema básico de autenticación mediante JWT.
+El servidor se desarrolló con Express y se levantó mediante un HTTP Server.

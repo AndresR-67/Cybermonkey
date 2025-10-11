@@ -1,43 +1,36 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import pkg from "pg";
 import http from "http";
+import pool from "./src/config/db.js";
+import connectMongo from "./src/config/mongo.js";
+import routes from "./src/routes/index.js"
 
 dotenv.config();
-
-const { Pool } = pkg;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// pool de conexión
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // Necesario para la conexión con render
-  },
-});
+// Conexión a PostgreSQL
+pool.connect()
+  .then(client => {
+    console.log("Conectado a PostgreSQL");
+    client.release();
+  })
+  .catch(err => console.error("Error conectando a PostgreSQL:", err.message));
 
-// Test DB
-const testDBConnection = async () => {
-  try {
-    const result = await pool.query("SELECT NOW()");
-    console.log("Conexión a la DB exitosa, hora actual:", result.rows[0].now);
-  } catch (err) {
-    console.error("Error conectando a la DB:", err.message);
-  }
-};
+// Conexión MongoDB
+connectMongo();
 
-// Crear servidor HTTP
+// 🔗 Rutas API
+app.use("/api", routes);
+
+// Servidor HTTP
 const httpServer = http.createServer(app);
-
-// Iniciar servidor
-httpServer.listen(PORT, async () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
-  await testDBConnection();
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
