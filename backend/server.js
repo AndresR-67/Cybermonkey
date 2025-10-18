@@ -26,11 +26,11 @@ pool.connect()
 // Conexión MongoDB
 connectMongo();
 
-// 🔗 Rutas API
+// Rutas API
 app.use("/api", routes);
 
 // Servidor HTTP
 const httpServer = http.createServer(app);
 httpServer.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
+  console.log(` Servidor corriendo en puerto ${PORT}`);
 });
