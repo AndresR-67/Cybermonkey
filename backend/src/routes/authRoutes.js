@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/register", register);       // RF01
 router.post("/login", login);             // RF02
-router.post("/logout", auth(), logout);   // RF03 - protegido (opcional)
+router.post("/logout", auth(), logout);   // RF03 - 
 router.get("/profile", auth(), profile);  // datos perfil
 
 export default router;

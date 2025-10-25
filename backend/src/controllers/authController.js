@@ -73,7 +73,7 @@ export const login = async (req, res) => {
     const payload = { id_usuario: user.id_usuario, username: user.username, id_rol: user.id_rol };
     const token = signToken(payload);
 
-    // Log login exitoso (guarda ip y userAgent si llegan)
+    // Log login exitoso
     await createLog({
       tabla: "usuarios",
       operacion: "LOGIN",
@@ -82,7 +82,7 @@ export const login = async (req, res) => {
       meta: { resultado: "success", ip: req.ip, userAgent: req.headers["user-agent"] }
     });
 
-    // Responder token y user (sin contrasena)
+    // Responder token y user 
     const safeUser = {
       id_usuario: user.id_usuario,
       nombres: user.nombres,
@@ -105,7 +105,6 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    // Token normalmente enviado por Authorization header. Extraemos info para registro.
     const authHeader = req.headers.authorization || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
     let usuario_sistema = "desconocido";
@@ -120,8 +119,7 @@ export const logout = async (req, res) => {
       meta: { ip: req.ip, userAgent: req.headers["user-agent"], tokenProvided: Boolean(token) }
     });
 
-    // Si quieres invalidar tokens de forma real, implementar blacklist (ver explicacion abajo).
-    // Aquí simplemente indicamos al cliente que elimine su token (stateless JWT).
+    
     return res.json({ message: "Logout OK. Elimine el token en cliente." });
   } catch (err) {
     console.error(err);

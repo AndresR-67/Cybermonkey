@@ -3,8 +3,7 @@ import { verifyToken } from "../utils/jwt.js";
 import { findById } from "../models/usuarioModel.js";
 
 /**
- * auth middleware: verifica JWT en Authorization Bearer o en cookie 'token' (si decides usar cookies)
- * usage:
+ * auth middleware: verifica JWT 
  *   app.get('/ruta', auth(), handler) // solo autenticado
  *   app.get('/admin', auth(['admin']), handler) // roles (usa nombres en la tabla roles)
  */
@@ -37,7 +36,6 @@ export default function auth(requiredRoles = null) {
         correo: user.correo
       };
 
-      // Si requiredRoles fue pasado, comprobarlo.
       if (requiredRoles && Array.isArray(requiredRoles)) {
         
         if (!requiredRoles.includes(user.id_rol) && !requiredRoles.includes(user.username)) {
