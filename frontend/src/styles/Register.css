@@ -1,0 +1,117 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.register-container {
+  display: flex;
+  height: 100vh;
+  background-color: #000;
+  color: #fff;
+}
+
+.register-container .container {
+  display: flex;
+  width: 100%;
+}
+
+/* Columna izquierda */
+.register-container .left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.register-container .left p {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #c23be6;
+  margin-bottom: 1rem;
+}
+
+.register-container .left img {
+  max-width: 300px;
+}
+
+/* Columna derecha */
+.register-container .right {
+  flex: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0c0221;
+  border-radius: 15px;
+  margin: 20px;
+  padding: 2rem;
+}
+
+.register-container .form-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-container .form-container h1 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #c23be6;
+}
+
+.register-container .form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.register-container .form-group input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background-color: #3a1078;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.register-container .form-group input::placeholder {
+  color: #ddd;
+}
+
+.register-container .btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #a020f0, #c23be6);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.register-container .btn:hover {
+  background: linear-gradient(90deg, #7a0fc9, #a020f0);
+}
+
+.register-container .login-link {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.register-container .login-link a {
+  color: #a020f0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.register-container .login-link a:hover {
+  text-decoration: underline;
+}

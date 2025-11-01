@@ -1,0 +1,119 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.home-container {
+  display: flex;
+  height: 100vh;
+  background-color: #0a0014;
+  color: white;
+}
+
+.home-container .sidebar {
+  width: 250px;
+  background-color: #55d14e;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.home-container .sidebar h2 {
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.home-container .menu {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.home-container .menu a {
+  display: block;
+  padding: 12px;
+  border-radius: 25px;
+  background-color: #1a1a1a;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.home-container .menu a:hover {
+  background-color: #8a2be2;
+}
+
+.home-container .sidebar img {
+  max-width: 200px;
+  margin: auto;
+}
+
+.home-container .main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.home-container .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.home-container .header h1 {
+  font-size: 2rem;
+  color: #c23be6;
+}
+
+.home-container .header p {
+  color: #aaa;
+}
+
+.home-container .profile {
+  background-color: #1a0030;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: right;
+}
+
+.home-container .profile a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.home-container .content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.home-container .card {
+  background-color: #1a0030;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.home-container .card h2 {
+  color: #c23be6;
+  margin-bottom: 1rem;
+}
+
+.home-container .footer {
+  text-align: center;
+  margin-top: auto;
+  color: #888;
+  font-size: 0.9rem;
+}
