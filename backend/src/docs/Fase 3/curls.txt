@@ -1,0 +1,68 @@
+Registro de usuario
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "michael",
+    "correo": "michael@foxriver",
+    "contraseña": "123456",
+    "id_rol": 2
+  }'
+
+
+Inicio de sesión
+
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "correo": "michael@foxriver",
+    "contraseña": "123456"
+  }'
+
+
+Obtener todos los usuarios (solo admin)
+curl -X GET http://localhost:3000/api/usuarios \
+  -H "Authorization: Bearer <token_admin>"
+
+
+Obtener usuario por ID
+curl -X GET http://localhost:3000/api/usuarios/1 \
+  -H "Authorization: Bearer <token_usuario>"
+
+
+Actualizar usuario
+
+curl -X PUT http://localhost:3000/api/usuarios/1 \
+  -H "Authorization: Bearer <token_usuario>" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "michael_scofield"}'
+
+
+Eliminar usuario (solo admin)
+curl -X DELETE http://localhost:3000/api/usuarios/3 \
+  -H "Authorization: Bearer <token_admin>"
+
+
+Crear usuario nuevo (solo admin)
+curl -X POST http://localhost:3000/api/usuarios \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombres": "Leone",
+    "apellidos": "Abbacchio",
+    "username": "abbacchio",
+    "correo": "abbacchio@example.com",
+    "contrasena": "purplehaze",
+    "id_rol": 2
+  }'
+
+
+Actualizar usuario por ID (solo admin)
+
+curl -X PUT http://localhost:3000/api/usuarios/3 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "estado": "inactivo"
+  }'
+
+
