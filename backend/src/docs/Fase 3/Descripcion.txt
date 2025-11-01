@@ -1,0 +1,25 @@
+Fase: Autenticación, autorización y gestión de usuarios.
+Objetivo: Implementar un sistema seguro de registro, inicio de sesión y control de acceso mediante JWT y roles de usuario.
+Tecnologías:
+
+Node.js + Express (backend)
+
+PostgreSQL (base de datos)
+
+bcryptjs (encriptación de contraseñas)
+
+jsonwebtoken (tokens JWT)
+
+dotenv (manejo de variables de entorno)
+
+cookie-parser (manejo opcional de tokens en cookies)
+
+Flujo general:
+
+Un usuario se registra mediante /api/auth/register.
+
+Inicia sesión en /api/auth/login, donde obtiene un JWT firmado.
+
+Cada petición protegida debe incluir Authorization: Bearer <token>.
+
+El middleware auth.js valida el token, verifica el usuario y restringe el acceso según roles definidos.

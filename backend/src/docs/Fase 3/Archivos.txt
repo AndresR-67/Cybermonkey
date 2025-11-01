@@ -1,0 +1,12 @@
+| Archivo                                  | Descripción                                                                                     |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **server.js**                            | Punto de entrada. Carga Express, middlewares globales y rutas principales.                      |
+| **src/config/db.js**                     | Configuración y conexión a PostgreSQL mediante `pg`.                                            |
+| **src/models/usuarioModel.js**           | Contiene funciones para CRUD de usuarios (`findAll`, `findById`, `create`, `update`, `remove`). |
+| **src/models/rolModel.js**               | Permite obtener roles existentes (admin, usuario).                                              |
+| **src/controllers/authController.js**    | Controla registro y login. Cifra contraseñas y genera tokens JWT.                               |
+| **src/controllers/usuarioController.js** | Gestiona operaciones CRUD de usuarios. Valida permisos según el rol.                            |
+| **src/middleware/auth.js**               | Middleware que verifica JWT y restringe acceso según roles.                                     |
+| **src/utils/jwt.js**                     | Funciones auxiliares para generar y verificar tokens JWT.                                       |
+| **src/routes/authRoutes.js**             | Define las rutas `/api/auth/register` y `/api/auth/login`.                                      |
+| **src/routes/usuarioRoutes.js**          | Define las rutas CRUD de usuarios con protección por `auth()`.                                  |
