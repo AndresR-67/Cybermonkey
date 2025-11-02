@@ -5,7 +5,9 @@ import express from "express";
 import authRoutes from "./authRoutes.js";
 import logRoutes from "./logRoutes.js";
 import usuarioRoutes from "./usuarioRoutes.js";
-//import actividadRoutes from "./actividadRoutes.js";
+import actividadRoutes from "./actividadRoutes.js";
+import notasRoutes from "./notasRoutes.js";
+import historialRoutes from "./historialRoutes.js";
 //Simport gamificacionRoutes from "./gamificacionRoutes.js";
 
 // Inicializar router
@@ -15,6 +17,9 @@ const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/logs", logRoutes);
 router.use("/usuarios", usuarioRoutes);
+router.use("/actividades", actividadRoutes);
+router.use("/actividades/:id_actividad/notas", notasRoutes);
+router.use("/historial", historialRoutes);
 //router.use("/actividades", actividadRoutes);
 //router.use("/gamificacion", gamificacionRoutes);
 
