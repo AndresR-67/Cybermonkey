@@ -8,9 +8,8 @@ import usuarioRoutes from "./usuarioRoutes.js";
 import actividadRoutes from "./actividadRoutes.js";
 import notasRoutes from "./notasRoutes.js";
 import historialRoutes from "./historialRoutes.js";
-//Simport gamificacionRoutes from "./gamificacionRoutes.js";
+import gamificacionRoutes from "./gamificacionRoutes.js"; 
 
-// Inicializar router
 const router = express.Router();
 
 // Prefijos de API
@@ -20,8 +19,7 @@ router.use("/usuarios", usuarioRoutes);
 router.use("/actividades", actividadRoutes);
 router.use("/actividades/:id_actividad/notas", notasRoutes);
 router.use("/historial", historialRoutes);
-//router.use("/actividades", actividadRoutes);
-//router.use("/gamificacion", gamificacionRoutes);
+router.use("/gamificacion", gamificacionRoutes); 
 
 // Ruta base de prueba
 router.get("/", (req, res) => {
