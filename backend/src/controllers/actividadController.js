@@ -3,6 +3,9 @@ import * as actividadModel from "../models/actividadModel.js";
 import * as notasModel from "../models/notasModel.js";
 import alertaService from "../services/alertaService.js";
 import { createHistorial } from "../models/historialModel.js";
+import * as gamificacionService from "../services/gamificacionService.js";
+import * as gamificacionModel from "../models/gamificacionModel.js";
+
 
 /* ============================
    CONTROLADOR ACTIVIDADES
@@ -101,23 +104,33 @@ export const deleteActividad = async (req, res) => {
 
 
 /**
- * RF13 - Marcar actividad como completada
+ * RF13 - Marcar actividad como completada + Gamificación
  */
 export const completarActividad = async (req, res) => {
   try {
     const { id } = req.params;
     const id_usuario = req.user.id_usuario;
 
+    //  Completar la actividad en SQL
     const actividad = await actividadModel.completarActividad(id, id_usuario);
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
-    // Registrar acción en historial
+    //  Registrar en historial
     await createHistorial({
       id_usuario,
       id_actividad: actividad.id_actividad,
       accion: "COMPLETAR"
     });
 
+    //  Llamar al sistema de gamificación
+    try {
+      const gamificacionService = await import("../services/gamificacionService.js");
+      await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
+    } catch (gamiErr) {
+      console.warn("Gamificación no procesada:", gamiErr.message);
+    }
+
+    // Responder al cliente
     res.json({ message: "Actividad completada", actividad });
   } catch (err) {
     console.error("Error completarActividad:", err);
