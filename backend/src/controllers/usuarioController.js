@@ -9,23 +9,64 @@ import {
   updatePassword,
   updateFotoPerfil
 } from "../models/usuarioModel.js";
+import * as gamificacionService from "../services/gamificacionService.js";
+import * as gamificacionModel from "../models/gamificacionModel.js";
+import { calcularNivel } from "../utils/niveles.js";
+
+
 
 import LogModel from "../models/logModel.js";
 import bcrypt from "bcrypt";
 
 // ===================== USUARIO ESTÁNDAR =====================
 
-// Obtener perfil propio
+// Obtener perfil propio (extendido con gamificación)
 export const obtenerPerfil = async (req, res) => {
   try {
-    const id_usuario = req.user?.id_usuario; // viene del token JWT
+    const id_usuario = req.user?.id_usuario;
     const usuario = await findById(id_usuario);
     if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
-    res.json(usuario);
+
+    // Obtener progreso y recompensas
+    const [progreso, recompensas] = await Promise.all([
+      gamificacionModel.getProgresoUsuario(id_usuario),
+      gamificacionModel.getRecompensasUsuario(id_usuario),
+    ]);
+
+    // Calcular nivel y título
+    const { nivel, titulo } = calcularNivel(progreso?.xp_total || 0);
+
+    // Construir perfil extendido
+    const perfilExtendido = {
+      id_usuario: usuario.id_usuario,
+      nombres: usuario.nombres,
+      apellidos: usuario.apellidos,
+      username: usuario.username,
+      correo: usuario.correo,
+      foto_perfil: usuario.foto_perfil,
+      fecha_creacion: usuario.fecha_creacion,
+      id_rol: usuario.id_rol,
+      rol_nombre: usuario.rol_nombre,
+      estado: usuario.estado,
+      xp_total: progreso?.xp_total || 0,
+      nivel_actual: nivel,
+      titulo_nivel: titulo,
+      racha_actual: progreso?.dias_consecutivos || 0,
+      medallas: recompensas?.medallas || [],
+      logros: recompensas?.logros || [],
+    };
+
+    res.json(perfilExtendido);
   } catch (err) {
-    res.status(500).json({ error: "Error al obtener el perfil", details: err.message });
+    console.error("Error obtenerPerfil:", err);
+    res.status(500).json({
+      error: "Error al obtener el perfil",
+      details: err.message,
+    });
   }
 };
+
+
 
 // Modificar perfil (nombre, apellidos, correo, etc.)
 export const actualizarPerfil = async (req, res) => {
