@@ -27,16 +27,16 @@ export const obtenerPerfil = async (req, res) => {
     const usuario = await findById(id_usuario);
     if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
 
-    // Obtener progreso y recompensas
+    // Obtener progreso (xp, racha, nivel SQL) + recompensas (medallas, logros)
     const [progreso, recompensas] = await Promise.all([
       gamificacionModel.getProgresoUsuario(id_usuario),
       gamificacionModel.getRecompensasUsuario(id_usuario),
     ]);
 
-    // Calcular nivel y título
-    const { nivel, titulo } = calcularNivel(progreso?.xp_total || 0);
+    // Calcular nivel completo desde XP total
+    const nivelInfo = calcularNivel(progreso?.xp_total || 0);
 
-    // Construir perfil extendido
+    // Construir perfil extendido COMPLETO
     const perfilExtendido = {
       id_usuario: usuario.id_usuario,
       nombres: usuario.nombres,
@@ -48,15 +48,26 @@ export const obtenerPerfil = async (req, res) => {
       id_rol: usuario.id_rol,
       rol_nombre: usuario.rol_nombre,
       estado: usuario.estado,
+
+      // === GAMIFICACIÓN ===
       xp_total: progreso?.xp_total || 0,
-      nivel_actual: nivel,
-      titulo_nivel: titulo,
       racha_actual: progreso?.dias_consecutivos || 0,
+
+      // Nivel y progreso visual
+      nivel_actual: nivelInfo.nivel,
+      titulo_nivel: nivelInfo.titulo,
+      xp_min_nivel: nivelInfo.xp_min,
+      xp_max_nivel: nivelInfo.xp_max,
+      xp_faltante: nivelInfo.xp_faltante,
+      progreso_nivel: nivelInfo.porcentaje_progreso,
+
+      // Recompensas
       medallas: recompensas?.medallas || [],
       logros: recompensas?.logros || [],
     };
 
     res.json(perfilExtendido);
+
   } catch (err) {
     console.error("Error obtenerPerfil:", err);
     res.status(500).json({
@@ -65,6 +76,7 @@ export const obtenerPerfil = async (req, res) => {
     });
   }
 };
+
 
 
 
