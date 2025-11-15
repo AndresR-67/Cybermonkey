@@ -18,6 +18,11 @@ export const createActividad = async (req, res) => {
     const { titulo, descripcion, fecha_vencimiento, prioridad } = req.body;
     const id_usuario = req.user.id_usuario;
 
+     // Validar fecha de vencimiento
+    if (fecha_vencimiento && new Date(fecha_vencimiento) < new Date()) {
+      return res.status(400).json({ message: "La fecha de vencimiento no puede ser pasada" });
+    }
+
     const actividad = await actividadModel.createActividad({
       id_usuario,
       titulo,
