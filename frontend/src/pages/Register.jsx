@@ -1,6 +1,9 @@
+// frontend/src/pages/Register.jsx
+
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import '../styles/Register.css';
+import { registerRequest } from '../api/authApi';
 
 function Register() {
   const navigate = useNavigate();
@@ -8,7 +11,9 @@ function Register() {
     firstName: '',
     lastName: '',
     email: '',
-    password: ''
+    password: '',
+    username: '',
+    fotoPerfil: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -24,25 +29,32 @@ function Register() {
     setLoading(true);
 
     try {
-      // Simulamos registro en la API
-      console.log('Datos de registro:', formData);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (formData.firstName && formData.lastName && formData.email && formData.password) {
-        // Guardamos en localStorage
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        localStorage.setItem('userName', `${formData.firstName} ${formData.lastName}`);
-        
-        // Redirigimos a Home
-        navigate('/home');
-      } else {
-        alert('Por favor completa todos los campos');
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
       }
+
+      // Construimos el payload para el backend
+      const payload = {
+        nombres: formData.firstName,
+        apellidos: formData.lastName,
+        username: formData.username || formData.email.split('@')[0],
+        correo: formData.email,
+        contrasena: formData.password,
+        foto_perfil: formData.fotoPerfil || 'https://i.imgur.com/avatar.png'
+      };
+
+      const result = await registerRequest(payload);
+
+      // Guardamos info del usuario en localStorage
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('user', JSON.stringify(result.user));
+
+      // Redirigimos a Home
+      navigate('/home');
     } catch (error) {
       console.error('Error en registro:', error);
-      alert('Error al crear la cuenta');
+      alert(error.message);
     } finally {
       setLoading(false);
     }
@@ -81,6 +93,17 @@ function Register() {
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <input 
+                  type="text" 
+                  name="username"
+                  placeholder="Nombre de usuario (opcional)" 
+                  value={formData.username}
+                  onChange={handleChange}
+                />
+              </div>
+
               <div className="form-group">
                 <input 
                   type="email" 
@@ -91,6 +114,7 @@ function Register() {
                   required
                 />
               </div>
+
               <div className="form-group">
                 <input 
                   type="password" 
@@ -101,6 +125,17 @@ function Register() {
                   required
                 />
               </div>
+
+              <div className="form-group">
+                <input 
+                  type="text" 
+                  name="fotoPerfil"
+                  placeholder="URL foto de perfil (opcional)" 
+                  value={formData.fotoPerfil}
+                  onChange={handleChange}
+                />
+              </div>
+
               <button 
                 type="submit" 
                 className="btn"
