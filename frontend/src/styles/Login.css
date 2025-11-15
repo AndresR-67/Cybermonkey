@@ -1,3 +1,4 @@
+/* Reset y fuente */
 * {
   margin: 0;
   padding: 0;
@@ -5,18 +6,23 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Contenedor principal */
 .login-container {
   display: flex;
   height: 100vh;
-  background-color: #000;
+  background-color: #000; /* fondo negro */
   color: white;
+  overflow: hidden; /* evita que se vean bordes de la imagen */
 }
 
+/* Contenedor interno que contiene izquierda y derecha */
 .login-container .container {
   display: flex;
   width: 100%;
+  flex: 1;
 }
 
+/* Columna izquierda: formulario */
 .login-container .left {
   flex: 1;
   display: flex;
@@ -37,6 +43,7 @@
   color: #bbb;
 }
 
+/* Inputs del formulario */
 .login-container .form-group {
   width: 100%;
   max-width: 300px;
@@ -58,6 +65,7 @@
   color: #ddd;
 }
 
+/* Botón de login */
 .login-container .btn {
   width: 100%;
   max-width: 300px;
@@ -76,6 +84,7 @@
   background-color: #7a0fc9;
 }
 
+/* Registro */
 .login-container .register {
   margin-top: 1rem;
   font-size: 0.9rem;
@@ -91,8 +100,21 @@
   text-decoration: underline;
 }
 
+/* Columna derecha: imagen natural sin degradado ni bordes */
 .login-container .right {
   flex: 1;
-  background: url('../assets/login-bg.jpg') no-repeat center center/cover;
-  border-radius: 0 15px 15px 0;
+  background: linear-gradient(to left, rgba(10,10,10,0.8), rgba(10,10,10,0)), 
+              url('../assets/loginfondo.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* Responsivo: ocultar columna derecha en móviles */
+@media (max-width: 768px) {
+  .login-container .container {
+    flex-direction: column;
+  }
+
+  .login-container .right {
+    display: none;
+  }
 }
