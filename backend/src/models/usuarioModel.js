@@ -10,7 +10,7 @@ import pool from "../config/db.js";
    FUNCIONES DE USUARIO
 ============================ */
 
-// Crear cuenta (registro normal o con rol por defecto)
+// Crear cuenta
 export const createUser = async ({
   nombres,
   apellidos,
@@ -31,12 +31,15 @@ export const createUser = async ({
     const values = [nombres, apellidos, username, correo, contrasena, foto_perfil, id_rol, estado];
     const res = await client.query(q, values);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en createUser:", err);
+    throw err;
   } finally {
     client.release();
   }
 };
 
-// Buscar por correo o username (para login)
+// Buscar por correo o username
 export const findByCorreoOrUsername = async (identifier) => {
   const client = await pool.connect();
   try {
@@ -49,12 +52,15 @@ export const findByCorreoOrUsername = async (identifier) => {
     `;
     const res = await client.query(q, [identifier]);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en findByCorreoOrUsername:", err);
+    throw err;
   } finally {
     client.release();
   }
 };
 
-// Obtener datos del usuario por ID (incluye nombre del rol)
+// Obtener usuario por ID
 export const findById = async (id) => {
   const client = await pool.connect();
   try {
@@ -68,12 +74,15 @@ export const findById = async (id) => {
     `;
     const res = await client.query(q, [id]);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en findById:", err);
+    throw err;
   } finally {
     client.release();
   }
 };
 
-// Actualizar datos del usuario
+// Actualizar usuario
 export const updateUser = async (id_usuario, fieldsToUpdate) => {
   const client = await pool.connect();
   try {
@@ -96,8 +105,12 @@ export const updateUser = async (id_usuario, fieldsToUpdate) => {
       RETURNING id_usuario, nombres, apellidos, username, correo, foto_perfil, fecha_creacion, id_rol, estado;
     `;
     valores.push(id_usuario);
+
     const res = await client.query(q, valores);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en updateUser:", err);
+    throw err;
   } finally {
     client.release();
   }
@@ -115,6 +128,9 @@ export const updatePassword = async (id_usuario, nuevaContrasena) => {
     `;
     const res = await client.query(q, [nuevaContrasena, id_usuario]);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en updatePassword:", err);
+    throw err;
   } finally {
     client.release();
   }
@@ -132,17 +148,19 @@ export const updateFotoPerfil = async (id_usuario, nuevaFotoURL) => {
     `;
     const res = await client.query(q, [nuevaFotoURL, id_usuario]);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en updateFotoPerfil:", err);
+    throw err;
   } finally {
     client.release();
   }
 };
 
-
 /* ============================
-   FUNCIONES DE ADMIN
+   FUNCIONES ADMIN
 ============================ */
 
-// Listar todos los usuarios (con nombre de rol)
+// Listar usuarios
 export const findAllUsers = async () => {
   const client = await pool.connect();
   try {
@@ -155,12 +173,15 @@ export const findAllUsers = async () => {
     `;
     const res = await client.query(q);
     return res.rows;
+  } catch (err) {
+    console.error("❌ Error en findAllUsers:", err);
+    throw err;
   } finally {
     client.release();
   }
 };
 
-// Eliminar usuario (por id)
+// Eliminar usuario
 export const deleteUser = async (id_usuario) => {
   const client = await pool.connect();
   try {
@@ -171,6 +192,9 @@ export const deleteUser = async (id_usuario) => {
     `;
     const res = await client.query(q, [id_usuario]);
     return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en deleteUser:", err);
+    throw err;
   } finally {
     client.release();
   }
