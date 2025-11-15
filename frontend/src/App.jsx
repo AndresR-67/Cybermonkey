@@ -1,11 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import './styles/theme.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import Tasks from './pages/Tasks';
 import CreateTask from './pages/CreateTask';
-import Profile from './pages/Profile';
+import Estadisticas from './pages/Estadisticas'; 
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -34,11 +35,11 @@ function App() {
             <CreateTask />
           </ProtectedRoute>
         } />
-        <Route path="/profile" element={
-          <ProtectedRoute>
-            <Profile />
-          </ProtectedRoute>
-        } />
+        <Route path="/estadisticas" element={
+  <ProtectedRoute>
+    <Estadisticas />
+  </ProtectedRoute>
+} />
       </Routes>
     </div>
   );

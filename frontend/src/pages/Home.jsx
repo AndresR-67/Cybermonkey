@@ -96,7 +96,7 @@ const mensajes = [
 
           <nav className="menu">
             <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
-            <Link to="/profile"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
+            <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
             <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
           </nav>
         </div>
