@@ -22,26 +22,33 @@ function Login() {
     setLoading(true);
 
     try {
-      // Simulamos una petición a la API (aquí iría tu lógica real)
-      console.log('Datos de login:', formData);
-      
-      // Simulamos un delay de red
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Validación básica (en producción esto vendría del backend)
-      if (formData.email && formData.password) {
-        // Guardamos en localStorage para simular sesión
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        
-        // Redirigimos a Home
-        navigate('/home');
-      } else {
-        alert('Por favor completa todos los campos');
+      const res = await fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          identifier: formData.email,
+          contrasena: formData.password
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error("Error en las credenciales");
       }
+
+      const data = await res.json();
+
+      // Guardamos el token y el usuario completo
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirigimos
+      navigate("/home");
+
     } catch (error) {
-      console.error('Error en login:', error);
-      alert('Error al iniciar sesión');
+      console.error("Error en login:", error);
+      alert("Credenciales incorrectas o servidor no disponible");
     } finally {
       setLoading(false);
     }
