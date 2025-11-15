@@ -2,10 +2,9 @@
 import * as actividadModel from "../models/actividadModel.js";
 import * as notasModel from "../models/notasModel.js";
 import alertaService from "../services/alertaService.js";
-import { createHistorial } from "../models/historialModel.js";
 import * as gamificacionService from "../services/gamificacionService.js";
 import * as gamificacionModel from "../models/gamificacionModel.js";
-
+import { registrarAccion } from "../services/historialService.js";
 
 /* ============================
    CONTROLADOR ACTIVIDADES
@@ -28,10 +27,11 @@ export const createActividad = async (req, res) => {
     });
 
     // Registrar acción en historial
-    await createHistorial({
+    await registrarAccion({
       id_usuario,
       id_actividad: actividad.id_actividad,
-      accion: "CREAR"
+      accion: "CREAR",
+      titulo: actividad.titulo
     });
 
     // Generar alerta automáticamente si la fecha está próxima
@@ -56,10 +56,11 @@ export const updateActividad = async (req, res) => {
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
     // Registrar acción en historial
-    await createHistorial({
+    await registrarAccion({
       id_usuario: req.user.id_usuario,
       id_actividad: actividad.id_actividad,
-      accion: "MODIFICAR"
+      accion: "MODIFICAR",
+      titulo: actividad.titulo
     });
 
     // Re-evaluar alerta si fecha_vencimiento o prioridad cambió
@@ -85,12 +86,17 @@ export const deleteActividad = async (req, res) => {
     const actividad = await actividadModel.getActividadById(id);
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
-    // Registrar acción en historial antes de borrar
-    await createHistorial({
-      id_usuario: req.user.id_usuario,
-      id_actividad: actividad.id_actividad,
-      accion: "ELIMINAR"
-    });
+    // Registrar acción en historial **antes de eliminar**
+    try {
+      await registrarAccion({
+        id_usuario: req.user.id_usuario,
+        id_actividad: actividad.id_actividad,
+        accion: "ELIMINAR",
+        titulo: actividad.titulo
+      });
+    } catch (histErr) {
+      console.error("Error al registrar historial de eliminación:", histErr);
+    }
 
     // Borrar la actividad
     await actividadModel.deleteActividad(id);
@@ -101,8 +107,6 @@ export const deleteActividad = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar actividad" });
   }
 };
-
-
 /**
  * RF13 - Marcar actividad como completada + Gamificación
  */
@@ -111,26 +115,25 @@ export const completarActividad = async (req, res) => {
     const { id } = req.params;
     const id_usuario = req.user.id_usuario;
 
-    //  Completar la actividad en SQL
+    // Completar la actividad en SQL
     const actividad = await actividadModel.completarActividad(id, id_usuario);
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
-    //  Registrar en historial
-    await createHistorial({
+    // Registrar en historial
+    await registrarAccion({
       id_usuario,
       id_actividad: actividad.id_actividad,
-      accion: "COMPLETAR"
+      accion: "COMPLETAR",
+      titulo: actividad.titulo
     });
 
-    //  Llamar al sistema de gamificación
+    // Llamar al sistema de gamificación
     try {
-      const gamificacionService = await import("../services/gamificacionService.js");
       await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
     } catch (gamiErr) {
       console.warn("Gamificación no procesada:", gamiErr.message);
     }
 
-    // Responder al cliente
     res.json({ message: "Actividad completada", actividad });
   } catch (err) {
     console.error("Error completarActividad:", err);
@@ -166,10 +169,11 @@ export const addNota = async (req, res) => {
     const nota = await notasModel.createNota({ id_usuario, id_actividad, contenido });
 
     // Registrar acción en historial
-    await createHistorial({
+    await registrarAccion({
       id_usuario,
       id_actividad,
-      accion: "NOTA"
+      accion: "NOTA",
+      titulo: contenido // en notas, mejor usar el contenido de la nota
     });
 
     res.status(201).json({ message: "Nota creada", nota });
