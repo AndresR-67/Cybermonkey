@@ -86,13 +86,13 @@ export const deleteActividad = async (req, res) => {
     const actividad = await actividadModel.getActividadById(id);
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
-    // Registrar acción en historial **antes de eliminar**
+    // Registrar acción en historial antes de borrar
     try {
       await registrarAccion({
         id_usuario: req.user.id_usuario,
-        id_actividad: actividad.id_actividad,
+        id_actividad: null,       
         accion: "ELIMINAR",
-        titulo: actividad.titulo
+        titulo: actividad.titulo  // Guardamos el título para estadísticas
       });
     } catch (histErr) {
       console.error("Error al registrar historial de eliminación:", histErr);
@@ -107,6 +107,7 @@ export const deleteActividad = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar actividad" });
   }
 };
+
 /**
  * RF13 - Marcar actividad como completada + Gamificación
  */
