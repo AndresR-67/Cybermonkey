@@ -10,9 +10,9 @@ const pool = new Pool({
   ssl: {
     rejectUnauthorized: false, // necesario para Render
   },
-  max: 10, // máximo de clientes en el pool
+  max: 20, // máximo de clientes en el pool
   idleTimeoutMillis: 30000, // tiempo máximo que un cliente puede estar idle antes de ser cerrado
-  connectionTimeoutMillis: 2000, // timeout para conectarse a la DB
+  connectionTimeoutMillis: 5000, // timeout para conectarse a la DB
 });
 
 // Listener global de errores de clientes inactivos
