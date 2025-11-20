@@ -66,7 +66,7 @@ function Register() {
         {/* Columna izquierda */}
         <div className="left">
           <p>Gestiona tu tiempo,<br />alcanza tus metas.</p>
-          <img src="/src/assets/register-illustration.png" alt="Ilustración escritorio" />
+          <img src="/src/assets/loginfondo.png" alt="Ilustración escritorio" />
         </div>
 
         {/* Columna derecha */}

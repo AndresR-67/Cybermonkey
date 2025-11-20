@@ -1,0 +1,657 @@
+/* ===== BOTÓN GLOBAL DE ACCESIBILIDAD ===== */
+.global-accessibility-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px;
+  border: 3px solid #a020f0;
+  border-radius: 15px;
+  background: #000000;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 60px;
+  font-weight: 600;
+}
+
+.global-accessibility-btn:hover {
+  transform: scale(1.05);
+  border-color: #8b0000;
+}
+
+.global-accessibility-btn.active {
+  background: #8b0000;
+  border-color: #ffffff;
+}
+
+.global-accessibility-btn:focus {
+  outline: 3px solid #ffd700;
+  outline-offset: 2px;
+}
+
+.accessibility-icon {
+  font-size: 1.2rem;
+}
+
+.accessibility-text {
+  font-weight: 700;
+}
+
+/* ===== ELIMINACIÓN DE BORDES EN MODO NORMAL ===== */
+
+/* --- BOTONES PRINCIPALES (sin bordes en modo normal) --- */
+.register-container .btn,
+.register-container button[type="submit"],
+.register-container .form-container .btn,
+.login-container .btn,
+.login-container button[type="submit"],
+.home-container .btn,
+.home-container button,
+.tasks-container .btn-add,
+.tasks-container .btn,
+.create-task-container .btn,
+.create-task-container button,
+.estadisticas-container .btn,
+.estadisticas-container button {
+  border: none !important;
+  outline: none !important;
+}
+
+/* --- INPUTS GENERALES (sin bordes en modo normal) --- */
+.register-container input,
+.register-container .form-group input,
+.register-container .form-container input,
+.login-container input,
+.login-container .form-group input,
+.home-container input,
+.tasks-container input,
+.tasks-container .filters input,
+.create-task-container input,
+.estadisticas-container input,
+textarea,
+select {
+  border: none !important;
+  outline: none !important;
+}
+
+/* ===== ESTILOS GLOBALES PARA MODO ACCESIBLE ===== */
+
+/* --- BOTONES PRINCIPALES --- */
+body.global-accessibility-mode .register-container .btn,
+body.global-accessibility-mode .register-container button[type="submit"],
+body.global-accessibility-mode .register-container .form-container .btn,
+body.global-accessibility-mode .login-container .btn,
+body.global-accessibility-mode .login-container button[type="submit"],
+body.global-accessibility-mode .home-container .btn,
+body.global-accessibility-mode .home-container button,
+body.global-accessibility-mode .tasks-container .btn-add,
+body.global-accessibility-mode .tasks-container .btn,
+body.global-accessibility-mode .create-task-container .btn,
+body.global-accessibility-mode .create-task-container button,
+body.global-accessibility-mode .estadisticas-container .btn,
+body.global-accessibility-mode .estadisticas-container button {
+  background: #8b0000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Hover de botones principales */
+body.global-accessibility-mode .register-container .btn:hover,
+body.global-accessibility-mode .register-container button[type="submit"]:hover,
+body.global-accessibility-mode .register-container .form-container .btn:hover,
+body.global-accessibility-mode .login-container .btn:hover,
+body.global-accessibility-mode .login-container button[type="submit"]:hover,
+body.global-accessibility-mode .home-container .btn:hover,
+body.global-accessibility-mode .home-container button:hover,
+body.global-accessibility-mode .tasks-container .btn-add:hover,
+body.global-accessibility-mode .tasks-container .btn:hover,
+body.global-accessibility-mode .create-task-container .btn:hover,
+body.global-accessibility-mode .create-task-container button:hover,
+body.global-accessibility-mode .estadisticas-container .btn:hover,
+body.global-accessibility-mode .estadisticas-container button:hover {
+  background: #a52a2a !important;
+  background-image: none !important;
+}
+
+/* --- SIDEBAR TASKS (Específico para el sidebar naranja/verde) --- */
+body.global-accessibility-mode .tasks-container .sidebar-tasks {
+  background: #8b0000 !important;
+  border-right: 3px solid #ffffff !important;
+  box-shadow: 4px 0 22px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode .tasks-container .sidebar-tasks::after {
+  background: #ffffff !important;
+  box-shadow: 0 0 12px #ffffff !important;
+}
+
+/* Menú del sidebar */
+body.global-accessibility-mode .tasks-container .menu-tasks a {
+  background-color: rgba(139, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container .menu-tasks a:hover,
+body.global-accessibility-mode .tasks-container .menu-tasks a.active {
+  background-color: #a52a2a !important;
+  box-shadow: 0 0 18px #ffffff !important;
+  border: 2px solid #ffd700 !important;
+}
+
+/* Título del sidebar */
+body.global-accessibility-mode .tasks-container .sidebar-title-tasks {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+/* --- HEADER TASKS --- */
+body.global-accessibility-mode .tasks-container .header-tasks h2 {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container .header-tasks p {
+  color: #e0e0e0 !important;
+}
+
+body.global-accessibility-mode .tasks-container .header-tasks {
+  border-bottom: 3px solid #ffffff !important;
+}
+
+/* --- TABLA TASKS --- */
+body.global-accessibility-mode .tasks-container table th {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container table tr:nth-child(even) {
+  background-color: #1a1a1a !important;
+}
+
+body.global-accessibility-mode .tasks-container table tr:nth-child(odd) {
+  background-color: #2a2a2a !important;
+}
+
+/* Prioridades en modo accesible */
+body.global-accessibility-mode .tasks-container .priority.alta {
+  color: #ff6b6b !important;
+  font-weight: 700 !important;
+}
+
+body.global-accessibility-mode .tasks-container .priority.media {
+  color: #ffa500 !important;
+  font-weight: 700 !important;
+}
+
+body.global-accessibility-mode .tasks-container .priority.baja {
+  color: #90ee90 !important;
+  font-weight: 700 !important;
+}
+
+/* Botones de acciones en tabla */
+body.global-accessibility-mode .tasks-container .actions button {
+  color: #ffffff !important;
+  background: none !important;
+  border: 2px solid transparent !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+}
+
+body.global-accessibility-mode .tasks-container .actions button:hover {
+  color: #ffd700 !important;
+  border: 2px solid #ffd700 !important;
+  background: rgba(255, 215, 0, 0.1) !important;
+}
+
+/* --- MODAL TASKS --- */
+body.global-accessibility-mode .tasks-container .modal-content {
+  background: #1a1a1a !important;
+}
+
+body.global-accessibility-mode .tasks-container .modal-content h3 {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container .add-note textarea {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container .add-note button {
+  background: #8b0000 !important;
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .tasks-container .add-note button:hover {
+  background: #a52a2a !important;
+}
+
+/* --- INPUTS GENERALES (con bordes en modo accesible) --- */
+body.global-accessibility-mode .register-container input,
+body.global-accessibility-mode .register-container .form-group input,
+body.global-accessibility-mode .register-container .form-container input,
+body.global-accessibility-mode .login-container input,
+body.global-accessibility-mode .login-container .form-group input,
+body.global-accessibility-mode .home-container input,
+body.global-accessibility-mode .tasks-container input,
+body.global-accessibility-mode .tasks-container .filters input,
+body.global-accessibility-mode .create-task-container input,
+body.global-accessibility-mode .estadisticas-container input,
+body.global-accessibility-mode textarea,
+body.global-accessibility-mode select {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+/* Focus en inputs */
+body.global-accessibility-mode .register-container input:focus,
+body.global-accessibility-mode .register-container .form-group input:focus,
+body.global-accessibility-mode .register-container .form-container input:focus,
+body.global-accessibility-mode .login-container input:focus,
+body.global-accessibility-mode .login-container .form-group input:focus,
+body.global-accessibility-mode .home-container input:focus,
+body.global-accessibility-mode .tasks-container input:focus,
+body.global-accessibility-mode .tasks-container .filters input:focus,
+body.global-accessibility-mode .create-task-container input:focus,
+body.global-accessibility-mode .estadisticas-container input:focus,
+body.global-accessibility-mode textarea:focus,
+body.global-accessibility-mode select:focus {
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3) !important;
+  outline: none !important;
+}
+
+/* --- TEXTOS PRINCIPALES --- */
+
+/* Register Page */
+body.global-accessibility-mode .register-container .form-container h1,
+body.global-accessibility-mode .register-container .form-container h1 span,
+body.global-accessibility-mode .register-container .left p {
+  color: #ffffff !important;
+}
+
+/* Login Page */
+body.global-accessibility-mode .login-container .left h1,
+body.global-accessibility-mode .login-container .left p {
+  color: #ffffff !important;
+}
+
+/* Home Page */
+body.global-accessibility-mode .home-container h1,
+body.global-accessibility-mode .home-container h2,
+body.global-accessibility-mode .home-container h3,
+body.global-accessibility-mode .home-container h4,
+body.global-accessibility-mode .home-container h5,
+body.global-accessibility-mode .home-container h6 {
+  color: #ffffff !important;
+}
+
+/* Tasks Page - Textos adicionales */
+body.global-accessibility-mode .tasks-container h1,
+body.global-accessibility-mode .tasks-container h2,
+body.global-accessibility-mode .tasks-container h3,
+body.global-accessibility-mode .tasks-container h4,
+body.global-accessibility-mode .tasks-container h5,
+body.global-accessibility-mode .tasks-container h6,
+body.global-accessibility-mode .tasks-container p,
+body.global-accessibility-mode .tasks-container span,
+body.global-accessibility-mode .tasks-container .filters span {
+  color: #ffffff !important;
+}
+
+/* Create Task Page */
+body.global-accessibility-mode .create-task-container h1,
+body.global-accessibility-mode .create-task-container h2,
+body.global-accessibility-mode .create-task-container h3,
+body.global-accessibility-mode .create-task-container h4,
+body.global-accessibility-mode .create-task-container h5,
+body.global-accessibility-mode .create-task-container h6 {
+  color: #ffffff !important;
+}
+
+/* Estadísticas Page */
+body.global-accessibility-mode .estadisticas-container h1,
+body.global-accessibility-mode .estadisticas-container h2,
+body.global-accessibility-mode .estadisticas-container h3,
+body.global-accessibility-mode .estadisticas-container h4,
+body.global-accessibility-mode .estadisticas-container h5,
+body.global-accessibility-mode .estadisticas-container h6 {
+  color: #ffffff !important;
+}
+
+
+/* Footer */
+body.global-accessibility-mode .tasks-container .footer {
+  color: #e0e0e0 !important;
+}
+
+/* --- ENLACES --- */
+body.global-accessibility-mode .register-container a,
+body.global-accessibility-mode .register-container .login-link a,
+body.global-accessibility-mode .login-container a,
+body.global-accessibility-mode .login-container .register a,
+body.global-accessibility-mode .home-container a,
+body.global-accessibility-mode .tasks-container a,
+body.global-accessibility-mode .create-task-container a,
+body.global-accessibility-mode .estadisticas-container a {
+  color: #1e90ff !important;
+  text-decoration: underline !important;
+  font-weight: 600 !important;
+}
+
+/* Hover en enlaces */
+body.global-accessibility-mode .register-container a:hover,
+body.global-accessibility-mode .register-container .login-link a:hover,
+body.global-accessibility-mode .login-container a:hover,
+body.global-accessibility-mode .login-container .register a:hover,
+body.global-accessibility-mode .home-container a:hover,
+body.global-accessibility-mode .tasks-container a:hover,
+body.global-accessibility-mode .create-task-container a:hover,
+body.global-accessibility-mode .estadisticas-container a:hover {
+  color: #00bfff !important;
+}
+
+/* --- PLACEHOLDERS --- */
+body.global-accessibility-mode .register-container input::placeholder,
+body.global-accessibility-mode .login-container input::placeholder,
+body.global-accessibility-mode .home-container input::placeholder,
+body.global-accessibility-mode .tasks-container input::placeholder,
+body.global-accessibility-mode .tasks-container .filters input::placeholder,
+body.global-accessibility-mode .create-task-container input::placeholder,
+body.global-accessibility-mode .estadisticas-container input::placeholder {
+  color: #b0b0b0 !important;
+}
+
+/* ===== ESTADISTICAS - MODO ACCESIBLE ===== */
+
+/* SIDEBAR ESTADISTICAS */
+body.global-accessibility-mode .estadisticas-container .sidebar-estadisticas {
+  background: #8b0000 !important;
+  border-right: 3px solid #ffffff !important;
+  box-shadow: 4px 0 22px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode
+  .estadisticas-container
+  .sidebar-estadisticas::after {
+  background: #ffffff !important;
+  box-shadow: 0 0 12px #ffffff !important;
+}
+
+/* Título sidebar */
+body.global-accessibility-mode
+  .estadisticas-container
+  .sidebar-title-estadisticas {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+/* Menú sidebar */
+body.global-accessibility-mode .estadisticas-container .menu-estadisticas a {
+  background-color: rgba(139, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode
+  .estadisticas-container
+  .menu-estadisticas
+  a:hover,
+body.global-accessibility-mode
+  .estadisticas-container
+  .menu-estadisticas
+  a.active {
+  background-color: #a52a2a !important;
+  box-shadow: 0 0 18px #ffffff !important;
+  border: 2px solid #ffd700 !important;
+}
+
+/* Botón hamburguesa */
+body.global-accessibility-mode
+  .estadisticas-container
+  .menu-toggle-estadisticas {
+  background: #8b0000 !important;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4) !important;
+}
+
+body.global-accessibility-mode
+  .estadisticas-container
+  .menu-toggle-estadisticas:hover {
+  background: #a52a2a !important;
+  box-shadow: 0 0 20px #ffffff !important;
+}
+
+/* Títulos principales */
+body.global-accessibility-mode .estadisticas-container .main-estadisticas h1 {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .estadisticas-container .main-estadisticas p {
+  color: #e0e0e0 !important;
+}
+
+/* Cards de estadísticas */
+body.global-accessibility-mode .estadisticas-container .card-estadisticas {
+  background: #1a1a1a !important;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode .estadisticas-container .card-estadisticas h3 {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .estadisticas-container .card-estadisticas p {
+  color: #e0e0e0 !important;
+}
+
+/* Heatmap */
+body.global-accessibility-mode .estadisticas-container .heatmap-day-active {
+  background-color: #8b0000 !important;
+}
+
+body.global-accessibility-mode .estadisticas-container .heatmap-day-inactive {
+  background-color: #2a2a2a !important;
+}
+
+/* Footer */
+body.global-accessibility-mode .estadisticas-container footer {
+  color: #e0e0e0 !important;
+}
+
+/* ===== HOME - MODO ACCESIBLE ===== */
+
+/* SIDEBAR HOME */
+body.global-accessibility-mode .home-container .sidebar {
+  background: #8b0000 !important;
+
+  box-shadow: 4px 0 22px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode .home-container .sidebar::after {
+  background: #ffffff !important;
+  box-shadow: 0 0 12px #ffffff !important;
+}
+
+/* Título sidebar */
+body.global-accessibility-mode .home-container .sidebar-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+/* Menú sidebar */
+body.global-accessibility-mode .home-container .menu a {
+  background-color: rgba(139, 0, 0, 0.6) !important;
+
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .menu a:hover {
+  background-color: #a52a2a !important;
+  box-shadow: 0 0 18px #ffffff !important;
+}
+
+/* Botón hamburguesa */
+body.global-accessibility-mode .home-container .menu-toggle {
+  background: #8b0000 !important;
+
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4) !important;
+}
+
+body.global-accessibility-mode .home-container .menu-toggle:hover {
+  background: #a52a2a !important;
+  box-shadow: 0 0 20px #ffffff !important;
+}
+
+/* Header Home */
+body.global-accessibility-mode .home-container .header-title {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .header-sub {
+  color: #e0e0e0 !important;
+}
+
+body.global-accessibility-mode .home-container .header {
+  border-bottom: 3px solid #ffffff !important;
+}
+
+/* User menu */
+body.global-accessibility-mode .home-container .user-icon {
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .user-icon:hover {
+  color: #ffd700 !important;
+  text-shadow: 0 0 10px #ffd700 !important;
+}
+
+body.global-accessibility-mode .home-container .dropdown {
+  background: #1a1a1a !important;
+
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode .home-container .dropdown a,
+body.global-accessibility-mode .home-container .dropdown button {
+  color: #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .dropdown a:hover,
+body.global-accessibility-mode .home-container .dropdown button:hover {
+  background: #8b0000 !important;
+}
+
+/* Cards Home */
+body.global-accessibility-mode .home-container .card {
+  background: #1a1a1a !important;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+}
+
+body.global-accessibility-mode .home-container .card h2 {
+  color: #ffffff !important;
+  text-shadow: 0 0 12px #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .big-number {
+  color: #ffffff !important;
+  text-shadow: 0 0 20px #ffffff !important;
+}
+
+body.global-accessibility-mode .home-container .card p {
+  color: #e0e0e0 !important;
+}
+
+/* Mensaje cyber */
+body.global-accessibility-mode .home-container .cyber-message {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px #ffffff !important;
+  border-right: 2px solid #ffffff !important;
+}
+
+/* Footer */
+body.global-accessibility-mode .home-container .footer {
+  color: #e0e0e0 !important;
+}
+
+/* Glitch effect en modo accesible */
+body.global-accessibility-mode .home-container .glitch::before {
+  color: #8b0000 !important;
+  text-shadow: -2px 0 #8b0000 !important;
+}
+
+body.global-accessibility-mode .home-container .glitch::after {
+  color: #ffffff !important;
+  text-shadow: 2px 0 #ffffff !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .global-accessibility-btn {
+    bottom: 15px;
+    left: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 0.7rem;
+    min-width: 50px;
+  }
+
+  .accessibility-icon {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .global-accessibility-btn {
+    bottom: 25px;
+    left: 25px;
+  }
+}
+
+/* ===== ACCESIBILIDAD MEJORADA ===== */
+
+/* Reduce movimiento para personas sensibles */
+@media (prefers-reduced-motion: reduce) {
+  .global-accessibility-btn {
+    transition: none;
+  }
+
+  .global-accessibility-btn:hover {
+    transform: none;
+  }
+
+  body.global-accessibility-mode .tasks-container .menu-tasks a {
+    transition: none !important;
+  }
+
+  body.global-accessibility-mode .login-container .google-btn,
+  body.global-accessibility-mode .register-container .google-btn {
+    transition: none !important;
+  }
+}
+
+/* Alto contraste forzado */
+@media (prefers-contrast: high) {
+  body.global-accessibility-mode {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  body.global-accessibility-mode .btn,
+  body.global-accessibility-mode button {
+    background-color: #000000 !important;
+
+    color: #ffffff !important;
+  }
+}

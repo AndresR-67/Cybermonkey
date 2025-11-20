@@ -10,10 +10,10 @@
 /* === GENERAL === */
 .home-container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;      /* ← CAMBIA A min-height */
   background: #050011;
   color: white;
-  overflow: hidden;
+  overflow-x: hidden;     /* ← CAMBIA A overflow-x */
 }
 
 /* ==== SIDEBAR REESTILIZADO ==== */
@@ -114,6 +114,8 @@
   position: relative; 
   margin-left: 260px;
   transition: 0.35s ease;
+  min-height: 100vh;      /* ← AGREGA esto */
+  overflow-y: auto;       /* ← AGREGA scroll vertical */
 }
 
 .sidebar.closed ~ .main {
