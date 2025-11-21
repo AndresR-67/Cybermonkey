@@ -1,27 +1,131 @@
-/* ===== BOTÓN GLOBAL DE ACCESIBILIDAD ===== */
-.global-accessibility-btn {
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.global-accessibility-container {
   position: fixed;
   bottom: 20px;
   left: 20px;
   z-index: 10000;
   display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.global-accessibility-container.collapsed {
+  left: 0;
+}
+
+/* ===== BOTÓN PRINCIPAL ===== */
+.global-accessibility-btn {
+  display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px;
+  gap: 6px;
+  padding: 14px 12px;
   border: 3px solid #a020f0;
-  border-radius: 15px;
+  border-radius: 18px;
   background: #000000;
   color: #ffffff;
   cursor: pointer;
   font-size: 0.8rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 60px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  min-width: 110px;
   font-weight: 600;
+  overflow: hidden;
+  max-width: 200px;
 }
 
-.global-accessibility-btn:hover {
+/* Estado colapsado - BOTÓN OCULTO */
+.global-accessibility-btn.collapsed {
+  min-width: 0;
+  max-width: 0;
+  padding: 0;
+  border: none;
+  opacity: 0;
+  pointer-events: none; /* No se puede interactuar */
+}
+
+/* Cuando está colapsado y deshabilitado */
+.global-accessibility-btn:disabled {
+  cursor: default;
+}
+
+.global-accessibility-btn:disabled:hover {
+  transform: none;
+  border-color: #a020f0;
+}
+
+/* Título del botón */
+.accessibility-title {
+  font-size: 10px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Ícono principal */
+.accessibility-icon {
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Texto de estado */
+.accessibility-text {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== BOTÓN DE TOGGLE SEPARADO ===== */
+.accessibility-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 20px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.2s ease;
+  outline: none !important;
+  z-index: 10001;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.accessibility-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+.accessibility-toggle:focus,
+.accessibility-toggle:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Flechas para colapsar/expandir */
+.toggle-arrow {
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.global-accessibility-container.collapsed .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+/* Estados del botón principal */
+.global-accessibility-btn:hover:not(:disabled) {
   transform: scale(1.05);
   border-color: #8b0000;
 }
@@ -31,17 +135,33 @@
   border-color: #ffffff;
 }
 
-.global-accessibility-btn:focus {
+.global-accessibility-btn:focus:not(:disabled) {
   outline: 3px solid #ffd700;
   outline-offset: 2px;
 }
 
-.accessibility-icon {
-  font-size: 1.2rem;
-}
+/* Responsive */
+@media (max-width: 768px) {
+  .global-accessibility-container {
+    bottom: 15px;
+    left: 15px;
+  }
 
-.accessibility-text {
-  font-weight: 700;
+  .global-accessibility-container.collapsed {
+    left: 0;
+  }
+
+  .global-accessibility-btn {
+    min-width: 100px;
+    padding: 12px 10px;
+    gap: 5px;
+  }
+
+  .accessibility-toggle {
+    width: 22px;
+    height: 22px;
+    padding: 6px;
+  }
 }
 
 /* ===== ELIMINACIÓN DE BORDES EN MODO NORMAL ===== */
@@ -328,7 +448,6 @@ body.global-accessibility-mode .estadisticas-container h5,
 body.global-accessibility-mode .estadisticas-container h6 {
   color: #ffffff !important;
 }
-
 
 /* Footer */
 body.global-accessibility-mode .tasks-container .footer {
