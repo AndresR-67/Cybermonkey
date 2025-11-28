@@ -72,7 +72,7 @@ function CreateTask() {
         {/* Sidebar */}
         <aside className={`sidebar-create ${sidebarOpen ? '' : 'closed'}`}>
           {/* Título arriba */}
-          <div className="sidebar-title-create">CyberMonkey</div>
+          <div className="sidebar-title-universal">CyberMonkey</div>
 
           {/* Menú con iconos */}
           <nav className="menu-create" style={{ marginTop: '3rem' }}>

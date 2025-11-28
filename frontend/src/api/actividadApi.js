@@ -47,9 +47,13 @@ export const updateActividad = async (id, { titulo, descripcion, prioridad, fech
   });
 };
 
-export const completeActividad = async (id) => {
-  return await request(`/actividades/${id}/completar`, { method: "PATCH" });
+export const completeActividad = async (id, estado) => {
+  return await request(`/actividades/${id}/estado`, {
+    method: "PATCH",
+    body: JSON.stringify({ estado })
+  });
 };
+
 
 export const deleteActividad = async (id) => {
   return await request(`/actividades/${id}`, { method: "DELETE" });
@@ -71,3 +75,10 @@ export const getNotas = async (actividadId) => {
 export const getHistorial = async () => {
   return await request("/historial", { method: "GET" });
 };
+
+export async function getMensajeMotivacional(categoria) {
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/motivacional/${categoria}`, {
+    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+  });
+  return res.json();
+}

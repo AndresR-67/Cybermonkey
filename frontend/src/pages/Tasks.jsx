@@ -15,6 +15,7 @@ import {
   getNotas
 } from '../api/actividadApi';
 import logo from "../assets/home.png";
+import { getMensajeMotivacional } from "../api/actividadApi"; 
 
 function Tasks() {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ function Tasks() {
   const [notaTemp, setNotaTemp] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [openMenu, setOpenMenu] = useState(false);
+  const [mensajeMotivacional, setMensajeMotivacional] = useState(null);
+
 
   useEffect(() => {
     fetchTareas();
@@ -54,18 +57,36 @@ function Tasks() {
     }
   };
 
-  const handleComplete = async (id) => {
-    try {
-      await completeActividad(id);
-      setTareas((prev) =>
-        prev.map((t) =>
-          t.id_actividad === id ? { ...t, estado: "completada" } : t
-        )
-      );
-    } catch (error) {
-      console.error("Error al completar tarea:", error);
+const handleComplete = async (id) => {
+  try {
+    const tareaActual = tareas.find((t) => t.id_actividad === id);
+
+    const nuevoEstado =
+      tareaActual.estado === "completada" ? "pendiente" : "completada";
+
+    // Llamamos la API enviando el nuevo estado
+    await completeActividad(id, nuevoEstado);
+
+    // Actualiza UI local
+    setTareas((prev) =>
+      prev.map((t) =>
+        t.id_actividad === id ? { ...t, estado: nuevoEstado } : t
+      )
+    );
+
+    // Mostrar motivación SOLO cuando se completa
+    if (nuevoEstado === "completada") {
+      const motivacion = await getMensajeMotivacional("completada");
+      setMensajeMotivacional(motivacion.mensaje);
     }
-  };
+
+  } catch (error) {
+    console.error("Error al completar tarea:", error);
+  }
+};
+
+
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("¿Seguro que quieres eliminar esta tarea?")) return;
@@ -292,11 +313,29 @@ function Tasks() {
           </div>
         )}
 
+{mensajeMotivacional && (
+  <div className="modal">
+    <div className="modal-content">
+      <h3>¡Tarea completada! 🎉</h3>
+      <p>{mensajeMotivacional}</p>
+
+      <button onClick={() => setMensajeMotivacional(null)}>
+        Cerrar
+      </button>
+    </div>
+  </div>
+)}
+
+
+
         <div className="footer">
           © 2025 CyberMonkey – Todos los derechos reservados
         </div>
       </main>
     </div>
+
+
+   
   );
 }
 
