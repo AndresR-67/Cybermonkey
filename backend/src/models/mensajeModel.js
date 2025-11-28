@@ -15,4 +15,8 @@ const mensajeSchema = new mongoose.Schema({
   creado_en: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-export default mongoose.model("MensajeMotivacional", mensajeSchema);
+export default mongoose.model(
+  "MensajeMotivacional",
+  mensajeSchema,
+  "mensajes_motivacionales" 
+);
