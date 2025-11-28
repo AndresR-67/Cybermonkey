@@ -171,9 +171,16 @@
 
 .filters input {
   padding: 6px 10px;
+  width: auto;            /* quitar ancho fijo */
+  flex: 1 1 auto;         /* que crezca/encoge con el contenedor */
+  min-width: 180px;       /* límite opcional */
+  height: 40px;           /* igualar altura a otros controles si hace falta */
   border-radius: 10px;
   border: none;
   outline: none;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
 }
 
 /* TABLA DE TAREAS */
