@@ -148,3 +148,35 @@ export const getRecompensasUsuario = async (id_usuario) => {
   }
 };
 
+/**
+ * Obtener todas las medallas disponibles
+ */
+export const getTodasMedallas = async () => {
+  try {
+    const res = await pool.query("SELECT * FROM medallas");
+    return res.rows;
+  } catch (err) {
+    console.error("Error al obtener todas las medallas:", err);
+    throw err;
+  }
+};
+
+export const getTareasDificilesCompletadas = async (id_usuario) => {
+  try {
+    const query = `
+      SELECT COUNT(*) AS total
+      FROM historial h
+      JOIN actividades a ON h.id_actividad = a.id_actividad
+      WHERE h.id_usuario = $1
+        AND LOWER(h.accion) LIKE '%complet%'
+        AND LOWER(a.prioridad) = 'alta';
+    `;
+    const res = await pool.query(query, [id_usuario]);
+    return parseInt(res.rows[0].total, 10);
+  } catch (err) {
+    console.error("Error al contar tareas difíciles:", err);
+    throw err;
+  }
+};
+
+

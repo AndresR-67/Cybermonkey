@@ -171,19 +171,11 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
 
   // Definir XP según prioridad
   let xpGanado = 0;
-
   switch ((actividad.prioridad || "").toLowerCase()) {
-    case "baja":
-      xpGanado = 5;
-      break;
-    case "media":
-      xpGanado = 10;
-      break;
-    case "alta":
-      xpGanado = 15;
-      break;
-    default:
-      xpGanado = 5;
+    case "baja": xpGanado = 5; break;
+    case "media": xpGanado = 10; break;
+    case "alta": xpGanado = 15; break;
+    default: xpGanado = 5;
   }
 
   // Otorgar XP
@@ -193,9 +185,16 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
     `Completó la actividad: "${actividad.titulo}" (Prioridad: ${actividad.prioridad})`
   );
 
+  // Obtener mensaje motivacional
   const mensaje = await obtenerMensajeMotivacional("completada", "es");
 
-  return { ...resultado, mensaje, xpOtorgado: xpGanado };
+  // Verificar y asignar medallas automáticamente
+  const nuevasMedallas = await verificarMedallas(id_usuario);
+  if (nuevasMedallas.length > 0) {
+    console.log(`Medallas obtenidas por ${id_usuario}:`, nuevasMedallas);
+  }
+
+  return { ...resultado, mensaje, xpOtorgado: xpGanado, nuevasMedallas };
 };
 
 export const obtenerMensajeMotivacional = async (
@@ -259,3 +258,106 @@ export const revertirActividadCompletada = async (id_usuario, actividad) => {
 
   return resultado;
 };
+
+
+/**
+ * Verifica todas las medallas disponibles y asigna al usuario
+ * si cumple los criterios.
+ * 
+ * Los criterios se esperan como JSON, por ejemplo:
+ * { "xp_minimo": 50, "racha_minima": 5 }
+ */
+export const verificarMedallas = async (id_usuario) => {
+  try {
+    // Obtener progreso general del usuario
+    const progreso = await gamificacionModel.getProgresoUsuario(id_usuario);
+    if (!progreso) throw new Error("Usuario no encontrado");
+
+    console.log("Progreso del usuario:", progreso);
+
+    // Obtener todas las medallas
+    const medallas = await gamificacionModel.getTodasMedallas();
+    console.log(`Total medallas disponibles: ${medallas.length}`);
+
+    // Obtener medallas que ya tiene el usuario
+    const medallasUsuario = await gamificacionModel.getRecompensasUsuario(id_usuario)
+      .then(r => r.medallas || []);
+    console.log("Medallas actuales del usuario:", medallasUsuario.map(m => m.nombre));
+
+    const medallasAsignadas = [];
+
+    for (const medalla of medallas) {
+      console.log(`\nVerificando medalla: ${medalla.nombre}`);
+
+      // Saltar si ya tiene la medalla
+      if (medallasUsuario.some(mu => mu.id_medalla === medalla.id_medalla)) {
+        console.log("-> Usuario ya tiene esta medalla, se salta");
+        continue;
+      }
+
+      // Manejar criterio que puede ser string JSON o objeto
+      let criterio = {};
+      try {
+        if (!medalla.criterio) {
+          criterio = {};
+        } else if (typeof medalla.criterio === "string") {
+          criterio = JSON.parse(medalla.criterio);
+        } else if (typeof medalla.criterio === "object") {
+          criterio = medalla.criterio;
+        } else {
+          criterio = {};
+        }
+      } catch (err) {
+        console.log("Error parseando criterio:", err);
+        criterio = {};
+      }
+
+      if (!criterio.tipo || criterio.valor === undefined) {
+        console.log("-> Criterio inválido, se salta");
+        continue;
+      }
+
+      let cumpleCriterio = false;
+
+      switch (criterio.tipo) {
+        case "xp":
+          console.log(`-> Tipo XP: ${progreso.xp_total} >= ${criterio.valor}?`);
+          if (progreso.xp_total >= criterio.valor) cumpleCriterio = true;
+          break;
+
+        case "nivel":
+          console.log(`-> Tipo Nivel: ${progreso.nivel} >= ${criterio.valor}?`);
+          if (progreso.nivel >= criterio.valor) cumpleCriterio = true;
+          break;
+
+        case "tareas_dificiles":
+          const totalDificiles = await gamificacionModel.getTareasDificilesCompletadas(id_usuario);
+          console.log(`-> Tipo Tareas Difíciles: ${totalDificiles} >= ${criterio.valor}?`);
+          if (totalDificiles >= criterio.valor) cumpleCriterio = true;
+          break;
+
+        default:
+          console.log(`-> Tipo de criterio desconocido: ${criterio.tipo}`);
+          break;
+      }
+
+      if (cumpleCriterio) {
+        console.log(`-> Cumple criterio, asignando medalla: ${medalla.nombre}`);
+        await otorgarMedalla(id_usuario, medalla.id_medalla);
+        medallasAsignadas.push(medalla.nombre);
+      } else {
+        console.log("-> No cumple criterio");
+      }
+    }
+
+    console.log("\nMedallas asignadas en esta ejecución:", medallasAsignadas);
+    return medallasAsignadas;
+  } catch (err) {
+    console.error("Error en verificarMedallas:", err);
+    return [];
+  }
+};
+
+
+
+
