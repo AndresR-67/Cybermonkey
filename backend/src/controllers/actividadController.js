@@ -232,8 +232,8 @@ export const actualizarEstadoActividad = async (req, res) => {
     let actividadActualizada;
 
     if (estado === "completada") {
-      // Completar la actividad y obtener si ya había sido completada antes
-      const { actividad: updatedActividad, yaHabiaSidoCompletada } = await actividadModel.completarActividad(id, id_usuario);
+      // Completar la actividad en SQL
+      const { actividad: updatedActividad } = await actividadModel.completarActividad(id, id_usuario);
       actividadActualizada = updatedActividad;
 
       // Registrar acción en historial
@@ -244,18 +244,16 @@ export const actualizarEstadoActividad = async (req, res) => {
         titulo: actividad.titulo,
       });
 
-      // Gamificación solo si no se había completado antes
-      if (!yaHabiaSidoCompletada) {
-        try {
-          const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividadActualizada);
-          console.log("XP otorgado:", resultadoXP.xpOtorgado);
-        } catch (gamiErr) {
-          console.warn("Gamificación no procesada:", gamiErr.message);
-        }
+      // SUMAR XP siempre, sin importar historial
+      try {
+        const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividadActualizada);
+        console.log("XP otorgado:", resultadoXP.xpOtorgado);
+      } catch (gamiErr) {
+        console.warn("Gamificación no procesada:", gamiErr.message);
       }
 
     } else if (estado === "pendiente") {
-      // Actualizar estado a pendiente sin afectar completada_historial
+      // Actualizar estado a pendiente
       actividadActualizada = await actividadModel.updateActividad(id, { estado: "pendiente" });
 
       // Registrar acción en historial
@@ -266,7 +264,7 @@ export const actualizarEstadoActividad = async (req, res) => {
         titulo: actividad.titulo,
       });
 
-      // Revertir gamificación solo si la actividad alguna vez estuvo completada
+      // RESTAR XP solo si la actividad alguna vez estuvo completada
       if (actividad.completada_historial) {
         try {
           const resultadoReversion = await gamificacionService.revertirActividadCompletada(id_usuario, actividadActualizada);
@@ -287,6 +285,7 @@ export const actualizarEstadoActividad = async (req, res) => {
     return res.status(500).json({ message: "Error al actualizar estado" });
   }
 };
+
 
 
 
