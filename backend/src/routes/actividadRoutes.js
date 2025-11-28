@@ -20,4 +20,8 @@ router.patch("/:id/completar", auth(), actividadController.completarActividad);
 // RF14 - Listar actividades, opcional por estado
 router.get("/", auth(), actividadController.getActividades);
 
+// RFXX - Actualizar estado de actividad (completada <-> pendiente)
+router.patch("/:id/estado", auth(), actividadController.actualizarEstadoActividad);
+
+
 export default router;

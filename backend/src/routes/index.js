@@ -9,6 +9,7 @@ import actividadRoutes from "./actividadRoutes.js";
 import notasRoutes from "./notasRoutes.js";
 import historialRoutes from "./historialRoutes.js";
 import gamificacionRoutes from "./gamificacionRoutes.js"; 
+import motivacionalRoutes from "./motivacionalRoutes.js";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use("/actividades", actividadRoutes);
 router.use("/actividades/:id_actividad/notas", notasRoutes);
 router.use("/historial", historialRoutes);
 router.use("/gamificacion", gamificacionRoutes); 
+router.use("/motivacional", motivacionalRoutes);
 
 // Ruta base de prueba
 router.get("/", (req, res) => {
