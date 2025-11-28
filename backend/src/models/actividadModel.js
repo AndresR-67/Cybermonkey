@@ -97,28 +97,44 @@ export const deleteActividad = async (id_actividad) => {
 };
 
 // Marcar actividad como completada (RF13 + RF18: insert en historial)
-export const completarActividad = async (id_actividad, id_usuario) => {
+export const completarActividad = async (id_actividad, id_usuario, xpOtorgado = 0) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
+    // Obtener la actividad
+    const resActividad = await client.query(
+      `SELECT * FROM actividades WHERE id_actividad = $1`,
+      [id_actividad]
+    );
+    const actividad = resActividad.rows[0];
+    if (!actividad) throw new Error("Actividad no encontrada");
+
+    // Calcular si ya había sido completada antes
+    const yaHabiaSidoCompletada = actividad.completada_historial;
+
+    // Actualizar estado y fecha completada + xp_otorgado
     const q1 = `
       UPDATE actividades
-      SET estado = 'completada', fecha_completada = NOW()
+      SET estado = 'completada',
+          fecha_completada = NOW(),
+          completada_historial = TRUE,
+          xp_otorgado = $2
       WHERE id_actividad = $1
       RETURNING *;
     `;
-    const res1 = await client.query(q1, [id_actividad]);
+    const res1 = await client.query(q1, [id_actividad, xpOtorgado]);
 
-    const q2 = `
-      INSERT INTO historial (id_usuario, id_actividad, fecha, accion)
-      VALUES ($1, $2, NOW(), 'completada')
-      RETURNING *;
-    `;
-    await client.query(q2, [id_usuario, id_actividad]);
+    // Registrar en historial
+    await client.query(
+      `INSERT INTO historial (id_usuario, id_actividad, fecha, accion)
+       VALUES ($1, $2, NOW(), 'COMPLETAR')
+       RETURNING *;`,
+      [id_usuario, id_actividad]
+    );
 
     await client.query("COMMIT");
-    return res1.rows[0];
+    return { actividad: res1.rows[0], yaHabiaSidoCompletada };
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
@@ -126,3 +142,48 @@ export const completarActividad = async (id_actividad, id_usuario) => {
     client.release();
   }
 };
+
+// Revertir actividad a pendiente
+export const revertirActividad = async (id_actividad, id_usuario) => {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const resActividad = await client.query(
+      `SELECT * FROM actividades WHERE id_actividad = $1`,
+      [id_actividad]
+    );
+    const actividad = resActividad.rows[0];
+    if (!actividad) throw new Error("Actividad no encontrada");
+
+    // Guardar XP que ya se otorgó para evitar restar de más
+    const xpRevertido = actividad.xp_otorgado || 0;
+
+    const q1 = `
+      UPDATE actividades
+      SET estado = 'pendiente',
+          xp_revertido = $2
+      WHERE id_actividad = $1
+      RETURNING *;
+    `;
+    const res1 = await client.query(q1, [id_actividad, xpRevertido]);
+
+    // Registrar en historial
+    await client.query(
+      `INSERT INTO historial (id_usuario, id_actividad, fecha, accion)
+       VALUES ($1, $2, NOW(), 'DESHACER_COMPLETAR')
+       RETURNING *;`,
+      [id_usuario, id_actividad]
+    );
+
+    await client.query("COMMIT");
+    return { actividad: res1.rows[0], xpRevertido };
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
+

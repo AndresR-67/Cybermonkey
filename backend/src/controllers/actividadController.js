@@ -24,12 +24,13 @@ export const createActividad = async (req, res) => {
     }
 
     const actividad = await actividadModel.createActividad({
-      id_usuario,
-      titulo,
-      descripcion,
-      fecha_vencimiento,
-      prioridad,
-    });
+  id_usuario,
+  titulo,
+  descripcion,
+  fecha_vencimiento,
+  prioridad,
+  completada_historial: false // <<< aseguramos que la actividad nueva nunca haya sido completada
+});
 
     // Registrar acción en historial
     await registrarAccion({
@@ -116,30 +117,36 @@ export const deleteActividad = async (req, res) => {
 /**
  * RF13 - Marcar actividad como completada + Gamificación
  */
+/**
+ * RF13 - Marcar actividad como completada + Gamificación
+ */
 export const completarActividad = async (req, res) => {
   try {
     const { id } = req.params;
     const id_usuario = req.user.id_usuario;
 
     // Completar la actividad en SQL
-    const actividad = await actividadModel.completarActividad(id, id_usuario);
+    const { actividad, yaHabiaSidoCompletada } = await actividadModel.completarActividad(id, id_usuario);
     if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
 
     // Registrar en historial
-    await registrarAccion({
-      id_usuario,
-      id_actividad: actividad.id_actividad,
-      accion: "COMPLETAR",
-      titulo: actividad.titulo
-    });
+await registrarAccion({
+  id_usuario,
+  id_actividad: actividad.id_actividad,
+  accion: "COMPLETAR",
+  titulo: actividad.titulo
+});
 
-    // Llamar al sistema de gamificación
-    try {
-      await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
-    } catch (gamiErr) {
-      console.warn("Gamificación no procesada:", gamiErr.message);
-    }
-
+    // Llamar al sistema de gamificación solo si no se había completado antes
+    // Solo otorgar XP si no se había completado antes
+if (!yaHabiaSidoCompletada) {
+  try {
+    const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
+    console.log("XP otorgado:", resultadoXP.xpOtorgado);
+  } catch (gamiErr) {
+    console.warn("Gamificación no procesada:", gamiErr.message);
+  }
+}
     res.json({ message: "Actividad completada", actividad });
   } catch (err) {
     console.error("Error completarActividad:", err);
@@ -202,3 +209,85 @@ export const getNotas = async (req, res) => {
     res.status(500).json({ message: "Error al obtener notas" });
   }
 };
+
+/**
+ * RFXX - Actualizar estado de actividad (completada <-> pendiente)
+ */
+export const actualizarEstadoActividad = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body; // "completada" o "pendiente"
+    const id_usuario = req.user.id_usuario;
+
+    // Validar estado permitido
+    if (!["completada", "pendiente"].includes(estado)) {
+      return res.status(400).json({ message: "Estado inválido" });
+    }
+
+    // Obtener actividad
+    const actividad = await actividadModel.getActividadById(id);
+    if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
+    if (actividad.id_usuario !== id_usuario) return res.status(403).json({ message: "No autorizado" });
+
+    let actividadActualizada;
+
+    if (estado === "completada") {
+      // Completar la actividad y obtener si ya había sido completada antes
+      const { actividad: updatedActividad, yaHabiaSidoCompletada } = await actividadModel.completarActividad(id, id_usuario);
+      actividadActualizada = updatedActividad;
+
+      // Registrar acción en historial
+      await registrarAccion({
+        id_usuario,
+        id_actividad: id,
+        accion: "COMPLETAR",
+        titulo: actividad.titulo,
+      });
+
+      // Gamificación solo si no se había completado antes
+      if (!yaHabiaSidoCompletada) {
+        try {
+          const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividadActualizada);
+          console.log("XP otorgado:", resultadoXP.xpOtorgado);
+        } catch (gamiErr) {
+          console.warn("Gamificación no procesada:", gamiErr.message);
+        }
+      }
+
+    } else if (estado === "pendiente") {
+      // Actualizar estado a pendiente sin afectar completada_historial
+      actividadActualizada = await actividadModel.updateActividad(id, { estado: "pendiente" });
+
+      // Registrar acción en historial
+      await registrarAccion({
+        id_usuario,
+        id_actividad: id,
+        accion: "DESHACER_COMPLETAR",
+        titulo: actividad.titulo,
+      });
+
+      // Revertir gamificación solo si la actividad alguna vez estuvo completada
+      if (actividad.completada_historial) {
+        try {
+          const resultadoReversion = await gamificacionService.revertirActividadCompletada(id_usuario, actividadActualizada);
+          console.log("XP revertido:", resultadoReversion.nuevoXP);
+        } catch (gamiErr) {
+          console.warn("Gamificación no revertida:", gamiErr.message);
+        }
+      }
+    }
+
+    return res.json({
+      message: `Actividad marcada como ${estado}`,
+      actividad: actividadActualizada,
+    });
+
+  } catch (error) {
+    console.error("Error al actualizar estado:", error);
+    return res.status(500).json({ message: "Error al actualizar estado" });
+  }
+};
+
+
+
+

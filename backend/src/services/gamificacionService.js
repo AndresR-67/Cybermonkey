@@ -1,12 +1,14 @@
 // src/services/gamificacionService.js
+
 import * as gamificacionModel from "../models/gamificacionModel.js";
 import GamificacionLogModel from "../models/gamificacionLogModel.js"; // Mongo
 import { calcularNivel } from "../utils/niveles.js";
+import MensajeMotivacional from "../models/mensajeModel.js";
 
 /* ==========================================================
    SERVICIO DE GAMIFICACIÓN (SQL + Mongo para logs)
-   Gestiona XP, niveles, penalizaciones, rachas,
-   medallas, logros y el registro histórico.
+   Gestiona XP, niveles, penalizaciones, rachas, medallas,
+   logros y el registro histórico.
 ========================================================== */
 
 export const otorgarXP = async (id_usuario, xpGanado, motivo = "") => {
@@ -18,7 +20,6 @@ export const otorgarXP = async (id_usuario, xpGanado, motivo = "") => {
 
   // Recalcular nivel
   const { nivel, titulo } = calcularNivel(nuevoXP);
-
   if (nivel !== progreso.nivel) {
     await gamificacionModel.actualizarNivel(id_usuario, nivel);
   }
@@ -35,8 +36,6 @@ export const otorgarXP = async (id_usuario, xpGanado, motivo = "") => {
 
   return { nuevoXP, nivel, titulo };
 };
-
-
 
 export const aplicarPenalizacion = async (id_usuario, tipo, motivo) => {
   const progreso = await gamificacionModel.getProgresoUsuario(id_usuario);
@@ -57,8 +56,11 @@ export const aplicarPenalizacion = async (id_usuario, tipo, motivo) => {
       xpPerdido = 5;
   }
 
-  // Actualizar XP en SQL y obtener valor actualizado
-  const resultado = await gamificacionModel.actualizarXP(id_usuario, -xpPerdido);
+  // Actualizar XP en SQL
+  const resultado = await gamificacionModel.actualizarXP(
+    id_usuario,
+    -xpPerdido
+  );
   const nuevoXP = resultado.xp_total;
 
   // Registrar log en Mongo
@@ -77,12 +79,20 @@ export const aplicarPenalizacion = async (id_usuario, tipo, motivo) => {
 /**
  * Actualizar o reiniciar racha de usuario
  */
-export const actualizarRachaUsuario = async (id_usuario, fechaActual = new Date()) => {
+export const actualizarRachaUsuario = async (
+  id_usuario,
+  fechaActual = new Date()
+) => {
   const progreso = await gamificacionModel.getProgresoUsuario(id_usuario);
   if (!progreso) throw new Error("Usuario no encontrado");
 
-  const ultima = progreso.ultima_fecha ? new Date(progreso.ultima_fecha) : null;
-  const diferencia = ultima ? (fechaActual - ultima) / (1000 * 60 * 60 * 24) : null;
+  const ultima = progreso.ultima_fecha
+    ? new Date(progreso.ultima_fecha)
+    : null;
+
+  const diferencia = ultima
+    ? (fechaActual - ultima) / (1000 * 60 * 60 * 24)
+    : null;
 
   let nuevaRacha = 1;
 
@@ -91,7 +101,11 @@ export const actualizarRachaUsuario = async (id_usuario, fechaActual = new Date(
     else nuevaRacha = 1;
   }
 
-  const racha = await gamificacionModel.actualizarRacha(id_usuario, nuevaRacha, fechaActual);
+  const racha = await gamificacionModel.actualizarRacha(
+    id_usuario,
+    nuevaRacha,
+    fechaActual
+  );
 
   // Log en Mongo
   await GamificacionLogModel.create({
@@ -142,7 +156,10 @@ export const otorgarLogro = async (id_usuario, id_logro) => {
  */
 export const obtenerProgresoCompleto = async (id_usuario) => {
   const progreso = await gamificacionModel.getProgresoUsuario(id_usuario);
-  const recompensas = await gamificacionModel.getRecompensasUsuario(id_usuario);
+  const recompensas = await gamificacionModel.getRecompensasUsuario(
+    id_usuario
+  );
+
   return { ...progreso, ...recompensas };
 };
 
@@ -154,6 +171,7 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
 
   // Definir XP según prioridad
   let xpGanado = 0;
+
   switch ((actividad.prioridad || "").toLowerCase()) {
     case "baja":
       xpGanado = 5;
@@ -165,7 +183,7 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
       xpGanado = 15;
       break;
     default:
-      xpGanado = 5; // default en caso de no tener prioridad
+      xpGanado = 5;
   }
 
   // Otorgar XP
@@ -175,5 +193,69 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
     `Completó la actividad: "${actividad.titulo}" (Prioridad: ${actividad.prioridad})`
   );
 
-  return resultado; // { nuevoXP, nivel, titulo }
+  const mensaje = await obtenerMensajeMotivacional("completada", "es");
+
+  return { ...resultado, mensaje, xpOtorgado: xpGanado };
+};
+
+export const obtenerMensajeMotivacional = async (
+  categoria = "completada",
+  idioma = "es"
+) => {
+  try {
+    const mensajes = await MensajeMotivacional.find({
+      categoria,
+      idioma,
+      activo: true,
+    });
+
+    if (!mensajes || mensajes.length === 0) {
+      return "¡Buen trabajo! Sigue avanzando, vas por buen camino.";
+    }
+
+    const random = mensajes[Math.floor(Math.random() * mensajes.length)];
+    return random.texto;
+  } catch (err) {
+    console.error("Error al obtener mensaje motivacional:", err);
+    return "¡Sigue adelante! Cada paso cuenta.";
+  }
+};
+
+export const revertirActividadCompletada = async (id_usuario, actividad) => {
+  if (!actividad) throw new Error("Actividad inválida");
+
+  let xpOtorgado = 0;
+
+  switch ((actividad.prioridad || "").toLowerCase()) {
+    case "baja":
+      xpOtorgado = 5;
+      break;
+    case "media":
+      xpOtorgado = 10;
+      break;
+    case "alta":
+      xpOtorgado = 15;
+      break;
+    default:
+      xpOtorgado = 5;
+  }
+
+  // Restar XP
+  const resultado = await otorgarXP(
+    id_usuario,
+    -xpOtorgado,
+    `Se desmarcó la actividad: "${actividad.titulo}" (Prioridad: ${actividad.prioridad})`
+  );
+
+  // Log explícito de reversión
+  await GamificacionLogModel.create({
+    usuario_id: id_usuario,
+    tipo: "reversión",
+    xp: -xpOtorgado,
+    detalle: `Reversión de XP por desmarcar actividad: "${actividad.titulo}"`,
+    origen: "actividad",
+    meta: { total_resultante: resultado.nuevoXP },
+  });
+
+  return resultado;
 };
