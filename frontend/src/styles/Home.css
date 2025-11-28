@@ -73,7 +73,7 @@
 .menu a {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   padding: 14px;
   border-radius: 14px;
   background-color: rgba(8, 8, 8, 0.4);

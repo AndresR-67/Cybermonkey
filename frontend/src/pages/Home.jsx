@@ -4,6 +4,8 @@ import { FaHome, FaChartBar, FaFolder, FaUserCircle } from "react-icons/fa";
 import '../styles/Home.css';
 import { useTypingGlitch } from "../hooks/useTypingGlitch";
 import logo from "../assets/home.png";
+import '../App.css';
+
 
 function Home() {
   const navigate = useNavigate();
@@ -91,17 +93,21 @@ const mensajes = [
 
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
-        <div className="sidebar-top">
-          <h2 className="sidebar-title">CyberMonkey</h2>
+  
+  {/* Título */}
+  <div className="sidebar-title-universal">CyberMonkey</div>
 
-          <nav className="menu">
-            <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
-            <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
-            <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
-          </nav>
-        </div>
-        <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
-      </aside>
+  {/* Menú */}
+  <nav className="menu">
+    <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
+    <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
+    <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
+  </nav>
+
+  {/* Logo */}
+  <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
+
+</aside>
 
       {/* BOTÓN HAMBURGUESA */}
       <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
