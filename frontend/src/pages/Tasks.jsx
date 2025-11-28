@@ -13,14 +13,26 @@ import {
   addNota,
   getNotas
 } from '../api/actividadApi';
-import logo from "../assets/home.png"; // Reciclamos logo de Estadisticas
+import logo from "../assets/home.png";
 
 function Tasks() {
   const navigate = useNavigate();
   const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
-  const [notaModal, setNotaModal] = useState({ abierta: false, notas: [], tituloTarea: "", idActividad: null });
+
+  const [filtroEstado, setFiltroEstado] = useState("todas");
+  const [filtroPrioridad, setFiltroPrioridad] = useState("todas");
+  const [ordenFecha, setOrdenFecha] = useState("desc");
+
+  const [notaModal, setNotaModal] = useState({
+    abierta: false,
+    notas: [],
+    tituloTarea: "",
+    idActividad: null
+  });
+
   const [notaTemp, setNotaTemp] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [openMenu, setOpenMenu] = useState(false);
@@ -76,7 +88,7 @@ function Tasks() {
       setNotaTemp("");
     } catch (error) {
       console.error("Error al cargar notas:", error);
-      alert("No se pudieron cargar las notas de esta tarea.");
+      alert("No se pudieron cargar las notas.");
     }
   };
 
@@ -97,7 +109,7 @@ function Tasks() {
       setNotaTemp("");
     } catch (error) {
       console.error("Error al agregar nota:", error);
-      alert("No se pudo guardar la nota. Intenta nuevamente.");
+      alert("No se pudo guardar la nota.");
     }
   };
 
@@ -105,19 +117,31 @@ function Tasks() {
     localStorage.removeItem("token");
     navigate("/login");
   };
-
-  const filteredTareas = tareas.filter((t) =>
-    t.titulo.toLowerCase().includes(search.toLowerCase())
-  );
+  // filtro completado
+  const filteredTareas = tareas
+    .filter((t) =>
+      t.titulo.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((t) => {
+      if (filtroEstado === "todas") return true;
+      return t.estado === filtroEstado;
+    })
+    .filter((t) => {
+      if (filtroPrioridad === "todas") return true;
+      return t.prioridad === filtroPrioridad;
+    })
+    .sort((a, b) => {
+      const fechaA = a.fecha_vencimiento ? new Date(a.fecha_vencimiento) : 0;
+      const fechaB = b.fecha_vencimiento ? new Date(b.fecha_vencimiento) : 0;
+      return ordenFecha === "asc" ? fechaA - fechaB : fechaB - fechaA;
+    });
 
   return (
     <div className="tasks-container">
       {/* Sidebar */}
       <aside className={`sidebar-tasks ${sidebarOpen ? '' : 'closed'}`}>
-        {/* Título arriba */}
         <div className="sidebar-title-tasks">CyberMonkey</div>
 
-        {/* Menú con iconos más abajo */}
         <nav className="menu-tasks" style={{ marginTop: '3rem' }}>
           <Link to="/home" className={window.location.pathname === '/home' ? 'active' : ''}>
             <FaHome className="icon" /><span>Inicio</span>
@@ -130,7 +154,6 @@ function Tasks() {
           </Link>
         </nav>
 
-        {/* Logo abajo */}
         <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
       </aside>
 
@@ -169,6 +192,7 @@ function Tasks() {
           <button className="btn-add"><FaPlus /> Nueva Tarea</button>
         </Link>
 
+        {/*  FILTROS NUEVOS */}
         <div className="filters">
           <input
             type="text"
@@ -176,7 +200,24 @@ function Tasks() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <span>Filtrar estado | Fecha / prioridad / nombre</span>
+
+          <select value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)}>
+            <option value="todas">Estado (todas)</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="completada">Completadas</option>
+          </select>
+
+          <select value={filtroPrioridad} onChange={(e) => setFiltroPrioridad(e.target.value)}>
+            <option value="todas">Prioridad (todas)</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+
+          <select value={ordenFecha} onChange={(e) => setOrdenFecha(e.target.value)}>
+            <option value="desc">Fecha ↓ (recientes)</option>
+            <option value="asc">Fecha ↑ (antiguas)</option>
+          </select>
         </div>
 
         {loading ? (
@@ -214,6 +255,7 @@ function Tasks() {
                   </td>
                 </tr>
               ))}
+
               {filteredTareas.length === 0 && (
                 <tr>
                   <td colSpan="5">No se encontraron tareas.</td>
@@ -223,7 +265,7 @@ function Tasks() {
           </table>
         )}
 
-        {/* Modal de notas */}
+        {/* MODAL DE NOTAS */}
         {notaModal.abierta && (
           <div className="modal">
             <div className="modal-content">
