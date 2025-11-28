@@ -6,6 +6,7 @@ import {
   FaStickyNote, FaPlus, FaUserCircle 
 } from 'react-icons/fa';
 import '../styles/Tasks.css';
+import '../App.css';
 import {
   getActividades,
   completeActividad,
@@ -140,7 +141,7 @@ function Tasks() {
     <div className="tasks-container">
       {/* Sidebar */}
       <aside className={`sidebar-tasks ${sidebarOpen ? '' : 'closed'}`}>
-        <div className="sidebar-title-tasks">CyberMonkey</div>
+        <div className="sidebar-title-universal">CyberMonkey</div>
 
         <nav className="menu-tasks" style={{ marginTop: '3rem' }}>
           <Link to="/home" className={window.location.pathname === '/home' ? 'active' : ''}>

@@ -93,3 +93,12 @@ html, body, #root, .App {
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
+
+.sidebar-title-universal {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}

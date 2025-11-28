@@ -4,6 +4,7 @@ import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import '../styles/Estadistica.css'; 
+import '../App.css';
 import { FaHome, FaChartBar, FaFolder } from "react-icons/fa";
 import logo from "../assets/home.png"; 
 
@@ -125,7 +126,7 @@ function Estadisticas() {
     <div className="estadisticas-container">
   <aside className={`sidebar-estadisticas ${sidebarOpen ? '' : 'closed'}`}>
     {/* Título arriba */}
-    <div className="sidebar-title-estadisticas">CyberMonkey</div>
+    <div className="sidebar-title-universal">CyberMonkey</div>
 
     {/* Menú con iconos */}
     <nav className="menu-estadisticas">
