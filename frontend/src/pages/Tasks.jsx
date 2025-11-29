@@ -57,24 +57,30 @@ function Tasks() {
     }
   };
 
+const [procesando, setProcesando] = useState({});
 const handleComplete = async (id) => {
+  // prevenimos SPAM CLICKS
+  if (procesando[id]) return; // <- IMPORTANTE
+
+  setProcesando(prev => ({ ...prev, [id]: true }));
+
   try {
     const tareaActual = tareas.find((t) => t.id_actividad === id);
 
     const nuevoEstado =
       tareaActual.estado === "completada" ? "pendiente" : "completada";
 
-    // Llamamos la API enviando el nuevo estado
+    // API
     await completeActividad(id, nuevoEstado);
 
-    // Actualiza UI local
+    // UI
     setTareas((prev) =>
       prev.map((t) =>
         t.id_actividad === id ? { ...t, estado: nuevoEstado } : t
       )
     );
 
-    // Mostrar motivación SOLO cuando se completa
+    // Modo motivación
     if (nuevoEstado === "completada") {
       const motivacion = await getMensajeMotivacional("completada");
       setMensajeMotivacional(motivacion.mensaje);
@@ -82,8 +88,12 @@ const handleComplete = async (id) => {
 
   } catch (error) {
     console.error("Error al completar tarea:", error);
+  } finally {
+    // liberamos bloqueo
+    setProcesando(prev => ({ ...prev, [id]: false }));
   }
 };
+
 
 
 
