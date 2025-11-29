@@ -6,6 +6,7 @@ import { useTypingGlitch } from "../hooks/useTypingGlitch";
 import logo from "../assets/home.png";
 import '../App.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Home() {
   const navigate = useNavigate();
@@ -65,12 +66,12 @@ function Home() {
       return;
     }
 
-    fetch("http://localhost:3000/api/usuarios/perfil", {
+    // PERFIL
+    fetch(`${API_URL}/usuarios/perfil`, {
       headers: { "Authorization": `Bearer ${token}` }
     })
       .then(res => {
         if (res.status === 401) {
-          // Token inválido o expirado
           localStorage.clear();
           navigate("/login");
           throw new Error('Sesión expirada');
@@ -79,7 +80,6 @@ function Home() {
         return res.json();
       })
       .then(data => {
-        // Asegurar que los arrays existan
         setPerfil({
           ...data,
           logros: data.logros || [],
@@ -89,14 +89,14 @@ function Home() {
       })
       .catch(err => {
         console.error("Error cargando perfil:", err);
-        // Si no redirigió ya, redirigir al login
         if (err.message !== 'Sesión expirada') {
           localStorage.clear();
           navigate("/login");
         }
       });
 
-    fetch("http://localhost:3000/api/actividades?estado=pendiente", {
+    // ACTIVIDADES
+    fetch(`${API_URL}/actividades?estado=pendiente`, {
       headers: { "Authorization": `Bearer ${token}` }
     })
       .then(res => {
@@ -121,28 +121,22 @@ function Home() {
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
   
-        {/* Título */}
         <div className="sidebar-title-universal">CyberMonkey</div>
 
-        {/* Menú */}
         <nav className="menu">
           <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
           <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
           <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
         </nav>
 
-        {/* Logo */}
         <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
 
       </aside>
 
-      {/* BOTÓN HAMBURGUESA */}
       <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
 
-      {/* CONTENIDO PRINCIPAL */}
       <main className="main">
 
-        {/* USER MENU */}
         <div className="user-menu">
           <FaUserCircle
             className="user-icon"
@@ -156,7 +150,6 @@ function Home() {
           )}
         </div>
 
-        {/* HEADER Y MENSAJE MOTIVACIONAL */}
         <header className="header">
           <div className="header-text">
             <h1 className="header-title">Bienvenido, {perfil.nombres}</h1>
@@ -170,7 +163,6 @@ function Home() {
           </div>
         </header>
 
-        {/* GRID DE TARJETAS */}
         <div className="content">
           <div className="card">
             <h2>Nivel actual</h2>

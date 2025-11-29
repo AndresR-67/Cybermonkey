@@ -46,76 +46,85 @@ function Estadisticas() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const TOKEN = localStorage.getItem('token');
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    // Obtener actividades
-    fetch('http://localhost:3000/api/actividades', {
-      headers: { Authorization: `Bearer ${TOKEN}` },
+  const TOKEN = localStorage.getItem("token");
+  if (!TOKEN) return;
+
+  // Obtener actividades
+  fetch(`${API_URL}/actividades`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  })
+    .then(res => res.json())
+    .then(data => {
+      const acts = data.actividades || [];
+      setActividades(acts);
+
+      const completadasCount = acts.filter(a => a.estado === 'completada').length;
+      setCompletadas(completadasCount);
+
+      const pendientesCount = acts.length - completadasCount;
+      setPendientes(pendientesCount > 0 ? pendientesCount : 0);
     })
-      .then(res => res.json())
-      .then(data => {
-        const acts = data.actividades || [];
-        setActividades(acts);
+    .catch(err => console.error("Error cargando actividades:", err));
 
-        const completadasCount = acts.filter(a => a.estado === 'completada').length;
-        setCompletadas(completadasCount);
+  // Obtener historial
+  fetch(`${API_URL}/historial`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  })
+    .then(res => res.json())
+    .then(data => {
+      const hist = data.historial || [];
+      setHistorial(hist);
 
-        const pendientesCount = acts.length - completadasCount;
-        setPendientes(pendientesCount > 0 ? pendientesCount : 0);
+      // Eficiencia
+      const tiempos = {};
+      hist.forEach(h => {
+        if (h.accion?.toUpperCase() === 'CREAR') tiempos[h.id_actividad] = new Date(h.fecha);
+        if (h.accion?.toUpperCase() === 'COMPLETAR' && tiempos[h.id_actividad]) {
+          tiempos[h.id_actividad] = (new Date(h.fecha) - tiempos[h.id_actividad]) / 1000;
+        }
       });
-
-    // Obtener historial
-    fetch('http://localhost:3000/api/historial', {
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    })
-      .then(res => res.json())
-      .then(data => {
-        const hist = data.historial || [];
-        setHistorial(hist);
-
-        // Eficiencia
-        const tiempos = {};
-        hist.forEach(h => {
-          if (h.accion?.toUpperCase() === 'CREAR') tiempos[h.id_actividad] = new Date(h.fecha);
-          if (h.accion?.toUpperCase() === 'COMPLETAR' && tiempos[h.id_actividad]) {
-            tiempos[h.id_actividad] = (new Date(h.fecha) - tiempos[h.id_actividad]) / 1000;
-          }
-        });
-        const tiemposValidos = Object.values(tiempos).filter(t => t);
-        setEficiencia(tiemposValidos.length > 0
+      const tiemposValidos = Object.values(tiempos).filter(t => t);
+      setEficiencia(
+        tiemposValidos.length > 0
           ? tiemposValidos.reduce((a, b) => a + b, 0) / tiemposValidos.length
           : 0
-        );
+      );
 
-        // Racha diaria y heatmap
-        const hoy = new Date();
-        const ultimos30 = Array.from({ length: 30 }).map((_, i) => {
-          const d = new Date();
-          d.setDate(hoy.getDate() - (29 - i));
-          return d.toISOString().split('T')[0];
-        });
-        setDiasUltimaSemana(ultimos30);
+      // Racha diaria y heatmap
+      const hoy = new Date();
+      const ultimos30 = Array.from({ length: 30 }).map((_, i) => {
+        const d = new Date();
+        d.setDate(hoy.getDate() - (29 - i));
+        return d.toISOString().split('T')[0];
+      });
+      setDiasUltimaSemana(ultimos30);
 
-        const rachaArr = ultimos30.map(dia =>
-          hist.some(h => h.accion?.toUpperCase() === 'COMPLETAR' && h.fecha.startsWith(dia)) ? 1 : 0
-        );
-        setRachaDiaria(rachaArr.filter(r => r > 0));
+      const rachaArr = ultimos30.map(dia =>
+        hist.some(h => h.accion?.toUpperCase() === 'COMPLETAR' && h.fecha.startsWith(dia)) ? 1 : 0
+      );
+      setRachaDiaria(rachaArr.filter(r => r > 0));
 
-        setHeatmapValues(hist
+      setHeatmapValues(
+        hist
           .filter(h => h.accion?.toUpperCase() === 'COMPLETAR')
           .map(h => ({ date: h.fecha.split('T')[0], count: 1 }))
-        );
-      });
-
-    // Racha actual
-    fetch('http://localhost:3000/api/usuarios/perfil', {
-      headers: { Authorization: `Bearer ${TOKEN}` },
+      );
     })
-      .then(res => res.json())
-      .then(data => {
-        if (data.racha_actual > 0) setRacha(data.racha_actual);
-      });
-  }, []);
+    .catch(err => console.error("Error cargando historial:", err));
+
+  // Racha actual
+  fetch(`${API_URL}/usuarios/perfil`, {
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.racha_actual > 0) setRacha(data.racha_actual);
+    })
+    .catch(err => console.error("Error cargando racha actual:", err));
+}, []);
 
   const eliminadas = historial.filter(h => h.accion?.toUpperCase() === 'ELIMINAR').length;
   const efectividad = (actividades.length + eliminadas) > 0

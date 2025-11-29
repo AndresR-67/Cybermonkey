@@ -1,6 +1,6 @@
 // src/api/actividadApi.js
 
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // ===== Helpers =====
 const getToken = () => localStorage.getItem("token");
@@ -54,7 +54,6 @@ export const completeActividad = async (id, estado) => {
   });
 };
 
-
 export const deleteActividad = async (id) => {
   return await request(`/actividades/${id}`, { method: "DELETE" });
 };
@@ -63,7 +62,7 @@ export const deleteActividad = async (id) => {
 export const addNota = async (actividadId, contenido) => {
   return await request(`/actividades/${actividadId}/notas`, {
     method: "POST",
-    body: JSON.stringify({ contenido }) // genera { contenido: "..." }
+    body: JSON.stringify({ contenido })
   });
 };
 
@@ -76,9 +75,12 @@ export const getHistorial = async () => {
   return await request("/historial", { method: "GET" });
 };
 
+// ===== Mensajes motivacionales =====
 export async function getMensajeMotivacional(categoria) {
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/motivacional/${categoria}`, {
-    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+  const res = await fetch(`${BASE_URL}/motivacional/${categoria}`, {
+    headers: {
+      "Authorization": `Bearer ${localStorage.getItem("token")}`
+    }
   });
   return res.json();
 }

@@ -3,6 +3,8 @@ import { useState } from 'react';
 import '../styles/Login.css';
 import { GoogleLogin } from '@react-oauth/google';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -24,7 +26,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -62,7 +64,7 @@ function Login() {
 
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:3000/api/auth/external-login', {
+      const res = await fetch(`${API_URL}/auth/external-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: googleToken })
@@ -92,7 +94,6 @@ function Login() {
   return (
     <div className="login-container">
       <div className="container">
-        {/* Columna izquierda */}
         <div className="left">
           <h1>Bienvenido!</h1>
           <p>Por favor ingresa tus datos</p>
@@ -129,7 +130,6 @@ function Login() {
             </button>
           </form>
 
-          {/* Botón de Google Login */}
           <div style={{ marginTop: 12 }}>
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
@@ -142,7 +142,6 @@ function Login() {
           </div>
         </div>
 
-        {/* Columna derecha */}
         <div className="right"></div>
       </div>
     </div>

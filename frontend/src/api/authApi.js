@@ -1,7 +1,9 @@
 // frontend/src/api/authApi.js
 
+const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
+
 export async function loginRequest(identifier, contrasena) {
-  const res = await fetch("http://localhost:3000/api/auth/login", {
+  const res = await fetch(`${API_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ identifier, contrasena })
@@ -12,9 +14,8 @@ export async function loginRequest(identifier, contrasena) {
   return data; // Contiene { token, user }
 }
 
-
 export async function registerRequest({ nombres, apellidos, username, correo, contrasena, foto_perfil }) {
-  const res = await fetch("http://localhost:3000/api/auth/register", {
+  const res = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ nombres, apellidos, username, correo, contrasena, foto_perfil })

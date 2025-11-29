@@ -61,24 +61,30 @@ function Profile() {
     return () => { clearTimeout(enable); clearTimeout(disable); };
   }, [isDone]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return navigate("/login");
+  const API_URL = import.meta.env.VITE_API_URL;
 
-    fetch("http://localhost:3000/api/usuarios/perfil", {
-      headers: { "Authorization": `Bearer ${token}` }
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  fetch(`${API_URL}/usuarios/perfil`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      setPerfil(data);
+      setFormInfo({
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        correo: data.correo
+      });
     })
-      .then(res => res.json())
-      .then(data => {
-        setPerfil(data);
-        setFormInfo({
-          nombres: data.nombres,
-          apellidos: data.apellidos,
-          correo: data.correo
-        });
-      })
-      .catch(err => console.error("Error cargando perfil:", err));
-  }, [navigate]);
+    .catch(err => console.error("Error cargando perfil:", err));
+}, [navigate]);
+
 
   const handleLogout = () => {
     localStorage.clear();
