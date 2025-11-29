@@ -370,38 +370,47 @@ export const verificarMedallas = async (id_usuario) => {
 };
 
 export const verificarLogros = async (id_usuario) => {
+  // Obtener datos base
   const progreso = await getProgresoUsuario(id_usuario);
   const nivel = progreso.nivel || 0;
-  const xp = progreso.xp_total || 0;
-  const racha = progreso.dias_consecutivos || 0;
+  const xpTotal = progreso.xp_total || 0;
 
-  // 1. Tareas entre horas
+  // Cantidad total de tareas completadas por el usuario
+  const tareasTotales = await getTareasTotales(id_usuario);
+
+  // 1. Tareas entre horas — Night Owl
   const nightOwl = await getTareasCompletadasEntreHoras(id_usuario, "00:00", "03:00");
   if (nightOwl) await asignarLogro(id_usuario, 22);
 
-  // 2. Tareas en intervalo (últimos 60 min)
-  const tareas1h = await getTareasEnIntervalo(id_usuario, 60);
-  if (tareas1h >= 3) await asignarLogro(id_usuario, 23);
+  // 2. Tareas en intervalo de 60 min — Sprint Master (3 tareas)
+  const tareasUltimaHora = await getTareasEnIntervalo(id_usuario, 60);
+  if (tareasUltimaHora >= 3) await asignarLogro(id_usuario, 23);
 
-  // 3. Totales
-  const totales = await getTareasTotales(id_usuario);
-  if (totales >= 10) await asignarLogro(id_usuario, 24);
+  // 3. Logros por cantidad total de tareas
+  if (tareasTotales >= 3) await asignarLogro(id_usuario, 11);   // Organizador
+  if (tareasTotales >= 5) await asignarLogro(id_usuario, 9);    // Motivador (adaptado)
+  if (tareasTotales >= 7) await asignarLogro(id_usuario, 3);    // “Dedicado diario” adaptado
+  if (tareasTotales >= 10) await asignarLogro(id_usuario, 24);  // Trabajador incansable
+  if (tareasTotales >= 10) await asignarLogro(id_usuario, 8);   // Trabajo en equipo (adaptado)
+  if (tareasTotales >= 10) await asignarLogro(id_usuario, 10);  // Mentor experto (adaptado)
+  if (tareasTotales >= 15) await asignarLogro(id_usuario, 7);   // Sin fallas (adaptado)
+  if (tareasTotales >= 30) await asignarLogro(id_usuario, 4);   // Imparable (adaptado)
+  if (tareasTotales >= 30) await asignarLogro(id_usuario, 13);  // Sin penalizaciones (adaptado)
+  if (tareasTotales >= 100) await asignarLogro(id_usuario, 14); // Veterano
 
-  // 4. Racha de días
-  if (racha >= 7) await asignarLogro(id_usuario, 25);
+  // 4. Niveles
+  if (nivel >= 2) await asignarLogro(id_usuario, 1); 
+  if (nivel >= 3) await asignarLogro(id_usuario, 2);
+  if (nivel >= 5) await asignarLogro(id_usuario, 26); // Ascenso meteórico
+  if (nivel >= 6) await asignarLogro(id_usuario, 15); // Leyenda
 
-  // 5. Nivel
-  if (nivel >= 5) await asignarLogro(id_usuario, 26);
-
-  // 6. XP total
-  if (xp >= 1000) await asignarLogro(id_usuario, 27);
-
-  // 7. Tareas difíciles
-  const dif = await getTareasDificilesCompletadas(id_usuario);
-  if (dif >= 5) await asignarLogro(id_usuario, 28);
+  // 5. XP totales
+  if (xpTotal >= 500) await asignarLogro(id_usuario, 12); // Estrella del mes (adaptado)
+  if (xpTotal >= 1000) await asignarLogro(id_usuario, 27); // XP Maestro
 
   return { success: true };
 };
+
 
 
 
