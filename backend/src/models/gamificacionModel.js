@@ -180,3 +180,42 @@ export const getTareasDificilesCompletadas = async (id_usuario) => {
 };
 
 
+export const getTareasCompletadasEntreHoras = async (id_usuario, horaMin, horaMax) => {
+  const query = `
+    SELECT 1
+    FROM actividades
+    WHERE id_usuario = $1
+      AND estado = 'completada'
+      AND TO_CHAR(fecha_completada, 'HH24:MI') BETWEEN $2 AND $3
+    LIMIT 1;
+  `;
+  const { rows } = await pool.query(query, [id_usuario, horaMin, horaMax]);
+  return rows.length > 0;
+};
+
+
+export const getTareasEnIntervalo = async (id_usuario, minutos) => {
+  const query = `
+    SELECT COUNT(*) AS total
+    FROM actividades
+    WHERE id_usuario = $1
+      AND estado = 'completada'
+      AND fecha_completada >= NOW() - INTERVAL '${minutos} minutes'
+  `;
+  const { rows } = await pool.query(query, [id_usuario]);
+  return Number(rows[0].total);
+};
+
+
+export const getTareasTotales = async (id_usuario) => {
+  const query = `
+    SELECT COUNT(*) AS total
+    FROM actividades
+    WHERE id_usuario = $1 AND estado = 'completada';
+  `;
+  const { rows } = await pool.query(query, [id_usuario]);
+  return Number(rows[0].total);
+};
+
+
+
