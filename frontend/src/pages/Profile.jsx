@@ -173,15 +173,14 @@ useEffect(() => {
 
       {/* SIDEBAR */}
       <aside className={`sidebar sidebar-yellow ${sidebarOpen ? "" : "closed"}`}>
-        <div className="sidebar-top">
-          <h2 className="sidebar-title">CyberMonkey</h2>
+        <div className="sidebar-title-universal">CyberMonkey</div>
 
-          <nav className="menu">
-            <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
-            <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
-            <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
-          </nav>
-        </div>
+        <nav className="menu">
+          <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
+          <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
+          <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
+        </nav>
+
         <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
       </aside>
 

@@ -12,8 +12,7 @@ function Register() {
     lastName: '',
     email: '',
     password: '',
-    username: '',
-    fotoPerfil: ''
+    username: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +40,7 @@ function Register() {
         username: formData.username || formData.email.split('@')[0],
         correo: formData.email,
         contrasena: formData.password,
-        foto_perfil: formData.fotoPerfil || 'https://i.imgur.com/avatar.png'
+        foto_perfil: 'https://i.imgur.com/avatar.png' // Foto por defecto
       };
 
       const result = await registerRequest(payload);
@@ -123,16 +122,6 @@ function Register() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                />
-              </div>
-
-              <div className="form-group">
-                <input 
-                  type="text" 
-                  name="fotoPerfil"
-                  placeholder="URL foto de perfil (opcional)" 
-                  value={formData.fotoPerfil}
-                  onChange={handleChange}
                 />
               </div>
 
