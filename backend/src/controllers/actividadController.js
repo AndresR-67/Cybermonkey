@@ -114,9 +114,7 @@ export const deleteActividad = async (req, res) => {
   }
 };
 
-/**
- * RF13 - Marcar actividad como completada + Gamificación
- */
+
 /**
  * RF13 - Marcar actividad como completada + Gamificación
  */
@@ -127,32 +125,45 @@ export const completarActividad = async (req, res) => {
 
     // Completar la actividad en SQL
     const { actividad, yaHabiaSidoCompletada } = await actividadModel.completarActividad(id, id_usuario);
-    if (!actividad) return res.status(404).json({ message: "Actividad no encontrada" });
+    if (!actividad) {
+      return res.status(404).json({ message: "Actividad no encontrada" });
+    }
 
     // Registrar en historial
-await registrarAccion({
-  id_usuario,
-  id_actividad: actividad.id_actividad,
-  accion: "COMPLETAR",
-  titulo: actividad.titulo
-});
+    await registrarAccion({
+      id_usuario,
+      id_actividad: actividad.id_actividad,
+      accion: "COMPLETAR",
+      titulo: actividad.titulo
+    });
 
-    // Llamar al sistema de gamificación solo si no se había completado antes
-    // Solo otorgar XP si no se había completado antes
-if (!yaHabiaSidoCompletada) {
-  try {
-    const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
-    console.log("XP otorgado:", resultadoXP.xpOtorgado);
-  } catch (gamiErr) {
-    console.warn("Gamificación no procesada:", gamiErr.message);
-  }
-}
-    res.json({ message: "Actividad completada", actividad });
+    // Procesar XP y logros SOLO si es la primera vez que se completa
+    if (!yaHabiaSidoCompletada) {
+      try {
+        // XP
+        const resultadoXP = await gamificacionService.procesarActividadCompletada(id_usuario, actividad);
+        console.log("XP otorgado:", resultadoXP.xpOtorgado);
+
+        // Logros
+        await gamificacionService.verificarLogros(id_usuario, actividad);
+        console.log("Logros verificados");
+
+      } catch (gamiErr) {
+        console.warn("Gamificación no procesada:", gamiErr.message);
+      }
+    }
+
+    return res.json({
+      message: "Actividad completada",
+      actividad
+    });
+
   } catch (err) {
     console.error("Error completarActividad:", err);
-    res.status(500).json({ message: "Error al completar actividad" });
+    return res.status(500).json({ message: "Error al completar actividad" });
   }
 };
+
 
 /**
  * RF14 - Listar actividades (opcional por estado)
