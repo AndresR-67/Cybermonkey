@@ -4,6 +4,16 @@ import * as gamificacionModel from "../models/gamificacionModel.js";
 import GamificacionLogModel from "../models/gamificacionLogModel.js"; // Mongo
 import { calcularNivel } from "../utils/niveles.js";
 import MensajeMotivacional from "../models/mensajeModel.js";
+import {
+  getProgresoUsuario,
+  asignarLogro,
+  getTareasCompletadasEntreHoras,
+  getTareasEnIntervalo,
+  getTareasTotales,
+  getTareasDificilesCompletadas
+} from "../models/gamificacionModel.js";
+
+
 
 /* ==========================================================
    SERVICIO DE GAMIFICACIÓN (SQL + Mongo para logs)
@@ -190,11 +200,12 @@ export const procesarActividadCompletada = async (id_usuario, actividad) => {
 
   // Verificar y asignar medallas automáticamente
   const nuevasMedallas = await verificarMedallas(id_usuario);
+  const nuevosLogros = await verificarLogros(id_usuario);
   if (nuevasMedallas.length > 0) {
     console.log(`Medallas obtenidas por ${id_usuario}:`, nuevasMedallas);
   }
 
-  return { ...resultado, mensaje, xpOtorgado: xpGanado, nuevasMedallas };
+  return { ...resultado, mensaje, xpOtorgado: xpGanado, nuevasMedallas, nuevosLogros };
 };
 
 export const obtenerMensajeMotivacional = async (
@@ -357,6 +368,43 @@ export const verificarMedallas = async (id_usuario) => {
     return [];
   }
 };
+
+export const verificarLogros = async (id_usuario) => {
+  const progreso = await getProgresoUsuario(id_usuario);
+  const nivel = progreso.nivel || 0;
+  const xp = progreso.xp_total || 0;
+  const racha = progreso.dias_consecutivos || 0;
+
+  // 1. Tareas entre horas
+  const nightOwl = await getTareasCompletadasEntreHoras(id_usuario, "00:00", "03:00");
+  if (nightOwl) await asignarLogro(id_usuario, 22);
+
+  // 2. Tareas en intervalo (últimos 60 min)
+  const tareas1h = await getTareasEnIntervalo(id_usuario, 60);
+  if (tareas1h >= 3) await asignarLogro(id_usuario, 23);
+
+  // 3. Totales
+  const totales = await getTareasTotales(id_usuario);
+  if (totales >= 10) await asignarLogro(id_usuario, 24);
+
+  // 4. Racha de días
+  if (racha >= 7) await asignarLogro(id_usuario, 25);
+
+  // 5. Nivel
+  if (nivel >= 5) await asignarLogro(id_usuario, 26);
+
+  // 6. XP total
+  if (xp >= 1000) await asignarLogro(id_usuario, 27);
+
+  // 7. Tareas difíciles
+  const dif = await getTareasDificilesCompletadas(id_usuario);
+  if (dif >= 5) await asignarLogro(id_usuario, 28);
+
+  return { success: true };
+};
+
+
+
 
 
 
