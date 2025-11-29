@@ -6,6 +6,7 @@ import {
   actualizarPerfil,
   cambiarContrasena,
   cambiarFotoPerfil,
+  eliminarCuentaPropia,
   adminCrearUsuario,
   adminListarUsuarios,
   adminActualizarUsuario,
@@ -27,6 +28,9 @@ router.put("/perfil/contrasena", auth(), cambiarContrasena);
 
 // Cambiar foto de perfil
 router.put("/perfil/foto", auth(), cambiarFotoPerfil);
+
+// Eliminar cuenta propia
+router.delete("/perfil", auth(), eliminarCuentaPropia);
 
 // ===================== RUTAS DE ADMINISTRADOR =====================
 

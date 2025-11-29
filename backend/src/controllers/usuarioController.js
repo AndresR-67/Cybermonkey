@@ -3,6 +3,7 @@ import {
   createUser,
   findAllUsers,
   findById,
+  findByIdWithPassword,
   findByCorreoOrUsername,
   updateUser,
   deleteUser,
@@ -12,9 +13,6 @@ import {
 import * as gamificacionService from "../services/gamificacionService.js";
 import * as gamificacionModel from "../models/gamificacionModel.js";
 import { calcularNivel } from "../utils/niveles.js";
-
-
-
 import LogModel from "../models/logModel.js";
 import bcrypt from "bcrypt";
 
@@ -77,9 +75,6 @@ export const obtenerPerfil = async (req, res) => {
   }
 };
 
-
-
-
 // Modificar perfil (nombre, apellidos, correo, etc.)
 export const actualizarPerfil = async (req, res) => {
   try {
@@ -107,17 +102,34 @@ export const actualizarPerfil = async (req, res) => {
 // Cambiar contraseña
 export const cambiarContrasena = async (req, res) => {
   try {
+    console.log("=== CAMBIAR CONTRASEÑA INICIADO ===");
     const id_usuario = req.user?.id_usuario;
+    console.log("ID Usuario:", id_usuario);
+    
     const { contrasena_actual, nueva_contrasena } = req.body;
+    console.log("Datos recibidos:", { 
+      tiene_actual: !!contrasena_actual, 
+      tiene_nueva: !!nueva_contrasena 
+    });
 
-    const usuario = await findById(id_usuario);
+    const usuario = await findByIdWithPassword(id_usuario);
+    console.log("Usuario encontrado:", usuario ? "SÍ" : "NO");
+    
     if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
 
+    console.log("Comparando contraseñas...");
     const coincide = await bcrypt.compare(contrasena_actual, usuario.contrasena);
+    console.log("Contraseña coincide:", coincide);
+    
     if (!coincide) return res.status(400).json({ error: "Contraseña actual incorrecta" });
 
+    console.log("Hasheando nueva contraseña...");
     const hash = await bcrypt.hash(nueva_contrasena, 10);
+    console.log("Hash generado");
+    
+    console.log("Actualizando contraseña en BD...");
     const actualizado = await updatePassword(id_usuario, hash);
+    console.log("Contraseña actualizada:", actualizado);
 
     await LogModel.create({
       tabla: "usuarios",
@@ -128,6 +140,8 @@ export const cambiarContrasena = async (req, res) => {
 
     res.json({ mensaje: "Contraseña actualizada correctamente" });
   } catch (err) {
+    console.error("❌ ERROR EN CAMBIAR CONTRASEÑA:", err);
+    console.error("Stack:", err.stack);
     res.status(500).json({ error: "Error al cambiar contraseña", details: err.message });
   }
 };
@@ -153,6 +167,48 @@ export const cambiarFotoPerfil = async (req, res) => {
     res.json(actualizado);
   } catch (err) {
     res.status(500).json({ error: "Error al cambiar la foto", details: err.message });
+  }
+};
+
+// Eliminar cuenta propia
+export const eliminarCuentaPropia = async (req, res) => {
+  try {
+    console.log("=== ELIMINAR CUENTA INICIADO ===");
+    const id_usuario = req.user?.id_usuario;
+    console.log("ID Usuario:", id_usuario);
+    
+    const { contrasena } = req.body;
+    console.log("Contraseña recibida:", contrasena ? "SÍ" : "NO");
+
+    const usuario = await findByIdWithPassword(id_usuario);
+    console.log("Usuario encontrado:", usuario ? "SÍ" : "NO");
+    
+    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    // Verificar contraseña antes de eliminar
+    console.log("Verificando contraseña...");
+    const coincide = await bcrypt.compare(contrasena, usuario.contrasena);
+    console.log("Contraseña coincide:", coincide);
+    
+    if (!coincide) return res.status(400).json({ error: "Contraseña incorrecta" });
+
+    console.log("Intentando eliminar usuario...");
+    const eliminado = await deleteUser(id_usuario);
+    console.log("Usuario eliminado:", eliminado);
+
+    await LogModel.create({
+      tabla: "usuarios",
+      operacion: "DELETE",
+      detalle: "Usuario eliminó su propia cuenta",
+      datos_anteriores: eliminado,
+      usuario_sistema: id_usuario.toString(),
+    });
+
+    res.json({ mensaje: "Cuenta eliminada correctamente" });
+  } catch (err) {
+    console.error("❌ ERROR EN ELIMINAR CUENTA:", err);
+    console.error("Stack:", err.stack);
+    res.status(500).json({ error: "Error al eliminar cuenta", details: err.message });
   }
 };
 

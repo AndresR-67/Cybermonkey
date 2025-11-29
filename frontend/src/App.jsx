@@ -1,12 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import "./styles/theme.css";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Tasks from "./pages/Tasks";
 import CreateTask from "./pages/CreateTask";
 import Estadisticas from "./pages/Estadisticas";
+import Profile from "./pages/Profile"; // ← AGREGADO
 import ProtectedRoute from "./components/ProtectedRoute";
 import GlobalAccessibilityButton from "./components/GlobalAccessibilityButton";
 
@@ -18,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
         <Route
           path="/"
           element={
@@ -26,6 +29,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/home"
           element={
@@ -34,6 +38,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/tasks"
           element={
@@ -42,6 +47,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/create-task"
           element={
@@ -50,11 +56,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/estadisticas"
           element={
             <ProtectedRoute>
               <Estadisticas />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ← NUEVA RUTA DEL PERFIL */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

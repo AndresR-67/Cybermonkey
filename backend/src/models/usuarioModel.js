@@ -60,7 +60,7 @@ export const findByCorreoOrUsername = async (identifier) => {
   }
 };
 
-// Obtener usuario por ID
+// Obtener usuario por ID (SIN contraseña - para perfil público)
 export const findById = async (id) => {
   const client = await pool.connect();
   try {
@@ -76,6 +76,29 @@ export const findById = async (id) => {
     return res.rows[0];
   } catch (err) {
     console.error("❌ Error en findById:", err);
+    throw err;
+  } finally {
+    client.release();
+  }
+};
+
+// Obtener usuario por ID CON contraseña (para autenticación)
+export const findByIdWithPassword = async (id) => {
+  const client = await pool.connect();
+  try {
+    const q = `
+      SELECT u.id_usuario, u.nombres, u.apellidos, u.username, u.correo,
+             u.contrasena, u.foto_perfil, u.fecha_creacion, u.id_rol, 
+             r.nombre AS rol_nombre, u.estado
+      FROM usuarios u
+      LEFT JOIN roles r ON u.id_rol = r.id_rol
+      WHERE u.id_usuario = $1
+      LIMIT 1;
+    `;
+    const res = await client.query(q, [id]);
+    return res.rows[0];
+  } catch (err) {
+    console.error("❌ Error en findByIdWithPassword:", err);
     throw err;
   } finally {
     client.release();

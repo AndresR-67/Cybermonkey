@@ -386,3 +386,31 @@
   border-top: 2px solid #4F52FF;
   box-shadow: 0 -4px 12px #4F52FF;
 }
+
+.profile-btn {
+  width: 100%;
+  background: #111;
+  color: #00eaff;
+  border: 1px solid #00eaff;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.profile-btn:hover {
+  background: #00eaff22;
+}
+
+.profile-btn.danger {
+  border-color: #ff2d2d;
+  color: #ff4d4d;
+}
+
+.profile-btn.danger:hover {
+  background: #ff000022;
+}

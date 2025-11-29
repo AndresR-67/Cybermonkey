@@ -14,7 +14,7 @@ function Home() {
   const [openMenu, setOpenMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-const mensajes = [
+  const mensajes = [
     "El obstáculo es el camino. Compila, depura, avanza.",
     "Lo que controlas es tu mente, no las circunstancias. Optimiza tu código interno.",
     "La acción en sí misma es suficiente. Escribe la siguiente línea.",
@@ -44,7 +44,6 @@ const mensajes = [
     "A veces solo necesitas ejecutar una instrucción más.",
   ];
 
-
   const [randomMsg] = useState(() =>
     mensajes[Math.floor(Math.random() * mensajes.length)]
   );
@@ -61,22 +60,50 @@ const mensajes = [
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return navigate("/login");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
     fetch("http://localhost:3000/api/usuarios/perfil", {
       headers: { "Authorization": `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 401) {
+          // Token inválido o expirado
+          localStorage.clear();
+          navigate("/login");
+          throw new Error('Sesión expirada');
+        }
+        if (!res.ok) throw new Error('Error al cargar perfil');
+        return res.json();
+      })
       .then(data => {
-        setPerfil(data);
+        // Asegurar que los arrays existan
+        setPerfil({
+          ...data,
+          logros: data.logros || [],
+          medallas: data.medallas || []
+        });
         localStorage.setItem("userName", data.nombres);
       })
-      .catch(err => console.error("Error cargando perfil:", err));
+      .catch(err => {
+        console.error("Error cargando perfil:", err);
+        // Si no redirigió ya, redirigir al login
+        if (err.message !== 'Sesión expirada') {
+          localStorage.clear();
+          navigate("/login");
+        }
+      });
 
     fetch("http://localhost:3000/api/actividades?estado=pendiente", {
       headers: { "Authorization": `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 401) return { actividades: [] };
+        if (!res.ok) throw new Error('Error al cargar actividades');
+        return res.json();
+      })
       .then(data => setActividades(data.actividades || []))
       .catch(err => console.error("Error cargando actividades:", err));
   }, [navigate]);
@@ -94,20 +121,20 @@ const mensajes = [
       {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "" : "closed"}`}>
   
-  {/* Título */}
-  <div className="sidebar-title-universal">CyberMonkey</div>
+        {/* Título */}
+        <div className="sidebar-title-universal">CyberMonkey</div>
 
-  {/* Menú */}
-  <nav className="menu">
-    <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
-    <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
-    <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
-  </nav>
+        {/* Menú */}
+        <nav className="menu">
+          <Link to="/home"><FaHome className="icon" /><span>Inicio</span></Link>
+          <Link to="/estadisticas"><FaChartBar className="icon" /><span>Estadísticas</span></Link>
+          <Link to="/tasks"><FaFolder className="icon" /><span>Tareas</span></Link>
+        </nav>
 
-  {/* Logo */}
-  <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
+        {/* Logo */}
+        <img src={logo} alt="CyberMonkey" className="sidebar-logo" />
 
-</aside>
+      </aside>
 
       {/* BOTÓN HAMBURGUESA */}
       <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
@@ -147,46 +174,55 @@ const mensajes = [
         <div className="content">
           <div className="card">
             <h2>Nivel actual</h2>
-            <p className="big-number">{perfil.nivel_actual}</p>
-            <p><strong>{perfil.titulo_nivel}</strong></p>
-            <p>XP total: {perfil.xp_total}</p>
-            <p>XP para siguiente nivel: {perfil.xp_faltante}</p>
-            <p>Progreso: {perfil.progreso_nivel}%</p>
-            <p>Rango nivel: {perfil.xp_min_nivel} XP — {perfil.xp_max_nivel} XP</p>
+            <p className="big-number">{perfil.nivel_actual || 0}</p>
+            <p><strong>{perfil.titulo_nivel || 'Sin nivel'}</strong></p>
+            <p>XP total: {perfil.xp_total || 0}</p>
+            <p>XP para siguiente nivel: {perfil.xp_faltante || 0}</p>
+            <p>Progreso: {perfil.progreso_nivel || 0}%</p>
+            <p>Rango nivel: {perfil.xp_min_nivel || 0} XP — {perfil.xp_max_nivel || 0} XP</p>
           </div>
 
           <div className="card">
             <h2>Logros recientes</h2>
-            {perfil.logros.length === 0 ? <p>No has obtenido logros aún.</p> :
+            {(!perfil.logros || perfil.logros.length === 0) ? (
+              <p>No has obtenido logros aún.</p>
+            ) : (
               perfil.logros.map(logro => (
                 <div key={logro.id_logro} className="logro-item">
                   <span className="icon">{logro.icono}</span>
                   <strong>{logro.nombre}</strong>
                   <p>{logro.descripcion}</p>
                 </div>
-              ))}
+              ))
+            )}
           </div>
 
           <div className="card">
             <h2>Medallas</h2>
-            {perfil.medallas.length === 0 ? <p>No tienes medallas todavía.</p> :
+            {(!perfil.medallas || perfil.medallas.length === 0) ? (
+              <p>No tienes medallas todavía.</p>
+            ) : (
               perfil.medallas.map(m => (
                 <div key={m.id_medalla} className="logro-item">
                   <span className="icon">{m.icono}</span>
                   <strong>{m.nombre}</strong>
                 </div>
-              ))}
+              ))
+            )}
           </div>
 
           <div className="card">
             <h2>Próximas actividades</h2>
-            {actividades.length === 0 ? <p>No tienes actividades pendientes</p> :
+            {actividades.length === 0 ? (
+              <p>No tienes actividades pendientes</p>
+            ) : (
               actividades.map(a => (
                 <div key={a.id_actividad} className="actividad-item">
                   <strong>{a.titulo}</strong>
                   <p>{a.descripcion}</p>
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -200,17 +236,3 @@ const mensajes = [
 }
 
 export default Home;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
